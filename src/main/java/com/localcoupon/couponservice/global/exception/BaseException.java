@@ -1,22 +1,19 @@
 package com.localcoupon.couponservice.global.exception;
 
-
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 public abstract class BaseException extends RuntimeException {
+    private final ErrorCode errorCode;
 
-    public BaseException(String message) {
-        super(message);
+    public BaseException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
     }
 
-    //Checked Exception을 감쌀때 사용
-    public BaseException(String message, Throwable cause) {
-        super(message, cause);
+
+    public HttpStatus getHttpStatus() {
+        return errorCode.getStatus();
     }
-
-    public abstract String getErrorCode();
-
-
-    public abstract HttpStatus getHttpStatus();
 }
-
