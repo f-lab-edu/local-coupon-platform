@@ -1,0 +1,26 @@
+= Local Coupon API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+
+== 사용자 API
+
+=== 회원가입 (POST /api/v1/user)
+include::{snippets}/user-create/curl-request.adoc[]
+include::{snippets}/user-create/http-request.adoc[]
+
+==== 요청 필드
+include::{snippets}/user-create/request-fields.adoc[]
+
+==== 응답 필드
+include::{snippets}/user-create/response-fields.adoc[]
+
+=== 내 정보 조회 (GET /api/v1/user/me)
+include::{snippets}/user-get-me/curl-request.adoc[]
+include::{snippets}/user-get-me/http-response.adoc[]
+
+==== 응답 필드
+include::{snippets}/user-get-me/response-fields.adoc[]
