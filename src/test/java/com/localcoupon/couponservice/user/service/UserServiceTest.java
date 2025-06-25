@@ -4,7 +4,6 @@ import com.localcoupon.couponservice.global.util.PasswordEncoder;
 import com.localcoupon.couponservice.user.dto.request.SignUpRequestDto;
 import com.localcoupon.couponservice.user.dto.response.UserResponseDto;
 import com.localcoupon.couponservice.user.entity.User;
-import com.localcoupon.couponservice.user.enums.UserErrorCode;
 import com.localcoupon.couponservice.user.exception.UserAlreadyExistsException;
 import com.localcoupon.couponservice.user.exception.UserNotFoundException;
 import com.localcoupon.couponservice.user.repository.UserRepository;
@@ -21,9 +20,10 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-class UserServiceImplTest {
+class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -39,23 +39,17 @@ class UserServiceImplTest {
     @Test
     @DisplayName("회원가입 성공")
     void 회원가입_성공() {
-        SignUpRequestDto dto = new SignUpRequestDto("test@example.com", "password123", "tester", "서울시", "110105");
+        //given
+        SignUpRequestDto dto = new SignUpRequestDto("test@example.com", "password123", "tester", "서울시", "11005");
+        User mockSavedUser = User.from(dto);
 
         when(userRepository.existsByEmail(dto.email())).thenReturn(false);
-
-        User mockSavedUser = User.builder()
-                .id(1L)
-                .email(dto.email())
-                .passwordEnc(PasswordEncoder.hash(dto.password()))
-                .nickname(dto.nickname())
-                .address(dto.address())
-                .regionCode(dto.regionCode())
-                .build();
-
         when(userRepository.save(any(User.class))).thenReturn(mockSavedUser);
 
+        //when
         UserResponseDto response = userService.signUpUser(dto);
 
+        //then
         assertThat(response.email()).isEqualTo(dto.email());
         verify(userRepository).save(any(User.class));
     }
@@ -63,7 +57,7 @@ class UserServiceImplTest {
     @Test
     @DisplayName("회원가입 실패 - 중복 이메일")
     void 회원가입_실패_중복이메일() {
-        SignUpRequestDto dto = new SignUpRequestDto("test@example.com", "password123", "tester", "서울시", "110105");
+        SignUpRequestDto dto = new SignUpRequestDto("test@example.com", "password123", "tester", "서울시", "11005");
 
         when(userRepository.existsByEmail(dto.email())).thenReturn(true);
 
@@ -98,27 +92,18 @@ class UserServiceImplTest {
     @DisplayName("회원가입 시 비밀번호 암호화 확인")
     void 회원가입시_비밀번호_암호화_확인() {
         // given
-        SignUpRequestDto dto = new SignUpRequestDto("test@example.com", "password123", "tester", "서울시", "110105");
+        SignUpRequestDto dto = new SignUpRequestDto("test@example.com", "password123", "tester", "서울시", "11005");
         when(userRepository.existsByEmail(dto.email())).thenReturn(false);
 
-        String encrypted = PasswordEncoder.hash(dto.password());
-
-        User savedUser = User.builder()
-                .id(1L)
-                .email(dto.email())
-                .passwordEnc(encrypted)
-                .nickname(dto.nickname())
-                .address(dto.address())
-                .regionCode(dto.regionCode())
-                .build();
-
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        User savedUser = User.from(dto);
 
         // when
+        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+
         UserResponseDto response = userService.signUpUser(dto);
 
         // then
-        assertThat(PasswordEncoder.verify(savedUser.getPasswordEnc(), dto.password())).isTrue();
+        assertThat(PasswordEncoder.decrypt(savedUser.getPasswordEnc(), dto.password())).isTrue();
         verify(userRepository).save(any(User.class));
     }
 
