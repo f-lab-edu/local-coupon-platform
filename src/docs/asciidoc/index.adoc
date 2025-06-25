@@ -2,25 +2,147 @@
 :doctype: book
 :icons: font
 :source-highlighter: highlightjs
+:highlightjsdir: https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0
+:highlightjs-theme: github
+:icons: font
+
 :toc: left
 :toclevels: 3
 :sectlinks:
+:snippets: build/generated-snippets
+
+== 인증 API (Auth)
+
+=== 로그인
+include::{snippets}/auth-login/curl-request.adoc[]
+include::{snippets}/auth-login/http-request.adoc[]
+
+==== 요청 필드
+include::{snippets}/auth-login/request-fields.adoc[]
+
+==== 응답 필드
+include::{snippets}/auth-login/response-fields.adoc[]
+
+=== 로그아웃
+include::{snippets}/auth-logout/curl-request.adoc[]
+include::{snippets}/auth-logout/http-request.adoc[]
+
+==== 응답 필드
+include::{snippets}/auth-logout/response-fields.adoc[]
 
 == 사용자 API
 
-=== 회원가입 (POST /api/v1/user)
+=== 회원가입 (POST /api/v1/users)
 include::{snippets}/user-create/curl-request.adoc[]
 include::{snippets}/user-create/http-request.adoc[]
-
-==== 요청 필드
-include::{snippets}/user-create/request-fields.adoc[]
 
 ==== 응답 필드
 include::{snippets}/user-create/response-fields.adoc[]
 
-=== 내 정보 조회 (GET /api/v1/user/me)
+=== 내 정보 조회 (GET /api/v1/users/me)
 include::{snippets}/user-get-me/curl-request.adoc[]
 include::{snippets}/user-get-me/http-response.adoc[]
 
 ==== 응답 필드
 include::{snippets}/user-get-me/response-fields.adoc[]
+
+== 사용자 쿠폰 API
+
+=== 내 쿠폰 목록 조회 (GET /api/v1/user-coupons)
+include::{snippets}/user-coupons-get/curl-request.adoc[]
+include::{snippets}/user-coupons-get/http-response.adoc[]
+
+==== 응답 필드
+include::{snippets}/user-coupons-get/response-fields.adoc[]
+
+=== 쿠폰 사용 (PATCH /api/v1/user-coupons/{id}/use)
+include::{snippets}/user-coupons-use/curl-request.adoc[]
+include::{snippets}/user-coupons-use/http-request.adoc[]
+include::{snippets}/user-coupons-use/http-response.adoc[]
+
+==== Path Parameters
+include::{snippets}/user-coupons-use/path-parameters.adoc[]
+
+==== 응답 필드
+include::{snippets}/user-coupons-use/response-fields.adoc[]
+
+== 쿠폰 API
+
+=== 쿠폰 목록 조회 (GET /api/v1/coupons)
+include::{snippets}/coupon-list/curl-request.adoc[]
+include::{snippets}/coupon-list/http-response.adoc[]
+
+==== 응답 필드
+include::{snippets}/coupon-list/response-fields.adoc[]
+
+=== 쿠폰 발급 (POST /api/v1/coupons/{couponId}/issue)
+include::{snippets}/coupon-issue/curl-request.adoc[]
+include::{snippets}/coupon-issue/http-request.adoc[]
+include::{snippets}/coupon-issue/http-response.adoc[]
+
+==== Path Parameters
+include::{snippets}/coupon-issue/path-parameters.adoc[]
+
+==== 응답 필드
+include::{snippets}/coupon-issue/response-fields.adoc[]
+
+== 쿠폰 관리 API (점주용)
+
+=== 쿠폰 등록 (POST /api/v1/coupons)
+include::{snippets}/coupon-create/curl-request.adoc[]
+include::{snippets}/coupon-create/http-request.adoc[]
+include::{snippets}/coupon-create/http-response.adoc[]
+
+==== 요청 필드
+include::{snippets}/coupon-create/request-fields.adoc[]
+
+==== 응답 필드
+include::{snippets}/coupon-create/response-fields.adoc[]
+
+=== 쿠폰 검증 (PATCH /api/v1/user-coupons/verify)
+include::{snippets}/coupon-verify/curl-request.adoc[]
+include::{snippets}/coupon-verify/http-request.adoc[]
+include::{snippets}/coupon-verify/http-response.adoc[]
+
+==== 응답 필드
+include::{snippets}/coupon-verify/response-fields.adoc[]
+
+== 매장 API (Store)
+
+=== 매장 등록 (POST /api/v1/stores)
+include::{snippets}/store-register/curl-request.adoc[]
+include::{snippets}/store-register/http-request.adoc[]
+include::{snippets}/store-register/http-response.adoc[]
+
+==== 요청 필드
+include::{snippets}/store-register/request-fields.adoc[]
+
+==== 응답 필드
+include::{snippets}/store-register/response-fields.adoc[]
+
+=== 매장 목록 조회 (GET /api/v1/stores)
+include::{snippets}/store-get-my/curl-request.adoc[]
+include::{snippets}/store-get-my/http-response.adoc[]
+
+==== 응답 필드
+include::{snippets}/store-get-my/response-fields.adoc[]
+
+== 캠페인 API
+
+=== 캠페인 등록 (POST /api/v1/campaigns)
+include::{snippets}/campaign-create/curl-request.adoc[]
+include::{snippets}/campaign-create/http-request.adoc[]
+include::{snippets}/campaign-create/http-response.adoc[]
+
+==== 요청 필드
+include::{snippets}/campaign-create/request-fields.adoc[]
+
+==== 응답 필드
+include::{snippets}/campaign-create/response-fields.adoc[]
+
+=== 캠페인 목록 조회 (GET /api/v1/campaigns)
+include::{snippets}/campaign-list/curl-request.adoc[]
+include::{snippets}/campaign-list/http-response.adoc[]
+
+==== 응답 필드
+include::{snippets}/campaign-list/response-fields.adoc[]

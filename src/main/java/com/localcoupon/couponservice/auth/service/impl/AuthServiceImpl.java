@@ -2,12 +2,13 @@ package com.localcoupon.couponservice.auth.service.impl;
 
 import com.localcoupon.couponservice.auth.context.AuthContextHolder;
 import com.localcoupon.couponservice.auth.dto.request.LoginRequestDto;
+import com.localcoupon.couponservice.auth.dto.response.LoginResponseDto;
+import com.localcoupon.couponservice.auth.dto.response.LogoutResponseDto;
 import com.localcoupon.couponservice.auth.enums.AuthErrorCode;
 import com.localcoupon.couponservice.auth.exception.PasswordNotMatchException;
 import com.localcoupon.couponservice.auth.service.AuthService;
 import com.localcoupon.couponservice.global.util.PasswordEncoder;
 import com.localcoupon.couponservice.global.util.TokenGenerator;
-import com.localcoupon.couponservice.auth.dto.response.LoginResponseDto;
 import com.localcoupon.couponservice.user.entity.User;
 import com.localcoupon.couponservice.user.enums.UserErrorCode;
 import com.localcoupon.couponservice.user.exception.UserNotFoundException;
@@ -31,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
 
-        if (!PasswordEncoder.verify(user.getPasswordEnc(), request.password())) {
+        if (!PasswordEncoder.decrypt(user.getPasswordEnc(), request.password())) {
             throw new PasswordNotMatchException(AuthErrorCode.PASSWORD_NOT_MATCHING);
         }
 
@@ -41,8 +42,9 @@ public class AuthServiceImpl implements AuthService {
         return new LoginResponseDto(sessionToken);
     }
 
-    public void logout(String sessionToken) {
+    public LogoutResponseDto logout(String sessionToken) {
         redisTemplate.delete(REDIS_SESSION_PREFIX + sessionToken);
+        return new LogoutResponseDto(sessionToken);
     }
 
     public String getUserEmailByToken(String sessionToken) {

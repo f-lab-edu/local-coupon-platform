@@ -1,11 +1,10 @@
 package com.localcoupon.couponservice.user.controller;
 
 import com.localcoupon.couponservice.auth.context.AuthContextHolder;
-import com.localcoupon.couponservice.auth.service.AuthService;
 import com.localcoupon.couponservice.global.constants.ApiMapping;
 import static com.localcoupon.couponservice.global.constants.ApiMapping.API_Prefix;
 
-import com.localcoupon.couponservice.global.response.SuccessResponse;
+import com.localcoupon.couponservice.global.dto.response.SuccessResponse;
 import com.localcoupon.couponservice.user.dto.request.SignUpRequestDto;
 import com.localcoupon.couponservice.user.dto.response.UserResponseDto;
 import com.localcoupon.couponservice.user.service.UserService;

@@ -1,7 +1,7 @@
 package com.localcoupon.couponservice.global.exception;
 
 import com.localcoupon.couponservice.global.CommonErrorCode;
-import com.localcoupon.couponservice.global.response.ErrorResponse;
+import com.localcoupon.couponservice.global.dto.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
