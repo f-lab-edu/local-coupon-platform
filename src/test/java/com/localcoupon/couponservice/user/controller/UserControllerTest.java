@@ -13,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
@@ -27,6 +26,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -40,9 +40,6 @@ class UserControllerTest {
 
     @MockBean
     private AuthService authService;
-
-    @MockBean
-    private StringRedisTemplate stringRedisTemplate;
 
     @MockBean
     private AuthInterceptor authInterceptor;
@@ -76,12 +73,14 @@ class UserControllerTest {
                         .content(json))
                 .andExpect(status().isOk())
                 .andDo(document("user-create",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("email").description("이메일"),
                                 fieldWithPath("password").description("비밀번호"),
                                 fieldWithPath("nickname").description("닉네임"),
                                 fieldWithPath("address").description("주소"),
-                                fieldWithPath("regionCode").description("지역 코드")
+                                fieldWithPath("regionCode").description("지역코드")
                         ),
                         responseFields(
                                 fieldWithPath("success").description("요청 성공 여부"),
@@ -109,6 +108,8 @@ class UserControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(document("user-get-me",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         responseFields(
                                 fieldWithPath("success").description("요청 성공 여부"),
                                 fieldWithPath("message").description("응답 메시지"),
