@@ -2,9 +2,10 @@ package com.localcoupon.couponservice.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.localcoupon.couponservice.auth.dto.request.LoginRequestDto;
+import com.localcoupon.couponservice.auth.dto.response.LoginResponseDto;
+import com.localcoupon.couponservice.auth.dto.response.LogoutResponseDto;
 import com.localcoupon.couponservice.auth.interceptor.AuthInterceptor;
 import com.localcoupon.couponservice.auth.service.AuthService;
-import com.localcoupon.couponservice.auth.dto.response.LoginResponseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,10 +21,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -63,6 +64,8 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk())
                 .andDo(document("auth-login",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("email").description("이메일"),
                                 fieldWithPath("password").description("비밀번호")
@@ -79,12 +82,16 @@ class AuthControllerTest {
     @Test
     @DisplayName("로그아웃 API 문서화")
     void logout() throws Exception {
-        doNothing().when(authService).logout("SESSION:abcd-1234");
+        // given
+        String token = "abcd-1234";
+        when(authService.logout(token)).thenReturn(new LogoutResponseDto(token));
 
         mockMvc.perform(post("/api/v1/auth/logout")
                         .header("Authorization", "SESSION:abcd-1234"))
                 .andExpect(status().isOk())
                 .andDo(document("auth-logout",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         responseFields(
                                 fieldWithPath("success").description("요청 성공 여부"),
                                 fieldWithPath("message").description("응답 메시지"),

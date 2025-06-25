@@ -9,7 +9,7 @@ public class PasswordEncoder {
 
     private static final Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id);
 
-    public static String hash(String password) {
+    public static String encrypt(String password) {
         char[] passwordChars = password.toCharArray();
         try {
             return argon2.hash(2, 65536, 1, passwordChars);
@@ -18,7 +18,7 @@ public class PasswordEncoder {
         }
     }
 
-    public static boolean verify(String hash, String password) {
+    public static boolean decrypt(String hash, String password) {
         char[] passwordChars = password.toCharArray();
         try {
             return argon2.verify(hash, passwordChars);
