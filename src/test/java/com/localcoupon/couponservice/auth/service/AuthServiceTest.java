@@ -50,7 +50,7 @@ public class AuthServiceTest {
         //given
         String email = "test@example.com";
         String rawPassword = "password123";
-        String hashedPassword = PasswordEncoder.hash(rawPassword);
+        String hashedPassword = PasswordEncoder.encrypt(rawPassword);
 
         User user = User.builder()
                 .email(email)
@@ -92,7 +92,7 @@ public class AuthServiceTest {
 
         User user = User.builder()
                 .email(email)
-                .passwordEnc(PasswordEncoder.hash(correctPassword))
+                .passwordEnc(PasswordEncoder.encrypt(correctPassword))
                 .build();
 
         //when
