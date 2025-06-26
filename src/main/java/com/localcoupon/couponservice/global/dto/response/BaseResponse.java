@@ -1,4 +1,4 @@
-package com.localcoupon.couponservice.global.response;
+package com.localcoupon.couponservice.global.dto.response;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
