@@ -6,7 +6,6 @@ import com.localcoupon.couponservice.auth.enums.AuthErrorCode;
 import com.localcoupon.couponservice.global.dto.LogContext;
 import com.localcoupon.couponservice.global.dto.response.ErrorResponse;
 import com.localcoupon.couponservice.global.exception.ErrorCode;
-import com.localcoupon.couponservice.global.util.ClientUtils;
 import com.localcoupon.couponservice.global.util.LogUtils;
 import com.localcoupon.couponservice.user.enums.UserErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,25 +40,17 @@ public class AuthInterceptor implements HandlerInterceptor {
                              Object handler)  {
         String uri = request.getRequestURI();
 
+        //로그인과 회원가입은 예외처리
         if (isExcluded(uri)) return true;
 
-        String sessionId = request.getHeader("Authorization");
-
-        return validateSession(sessionId)
+        return validateSession(request.getHeader("Authorization"))
                 .map(errorCode -> {
-                    response.setStatus(errorCode.getStatus().value());
-                    //쓰기 작업 수행
                     try {
                         String body = objectMapper.writeValueAsString(ErrorResponse.of(errorCode));
+                        response.setStatus(errorCode.getStatus().value());
                         response.getWriter().write(body);
                     } catch (IOException e) {
-                        LogUtils.error(LogContext.of(
-                                request.getRequestURI(),
-                                ClientUtils.extractClientIp(request.getHeader("X-Forwarded-For"), request.getRemoteAddr()),
-                                request.getMethod(),
-                                null,
-                                e
-                        ));
+                        LogUtils.error(LogContext.of(request, "[AuthInterceptor-Prehandle] Response Write IO Exception", e));
                     }
                     return false;
                 })
