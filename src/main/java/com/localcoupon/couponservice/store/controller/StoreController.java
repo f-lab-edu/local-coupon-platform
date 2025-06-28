@@ -1,8 +1,8 @@
 package com.localcoupon.couponservice.store.controller;
 
 import com.localcoupon.couponservice.auth.context.AuthContextHolder;
-import com.localcoupon.couponservice.global.constants.ApiMapping;
-import com.localcoupon.couponservice.global.dto.response.SuccessResponse;
+import com.localcoupon.couponservice.common.constants.ApiMapping;
+import com.localcoupon.couponservice.common.dto.response.SuccessResponse;
 import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
 import com.localcoupon.couponservice.store.dto.response.StoreResponseDto;
 import com.localcoupon.couponservice.store.service.StoreService;

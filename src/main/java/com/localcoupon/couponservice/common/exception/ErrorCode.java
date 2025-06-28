@@ -1,4 +1,4 @@
-package com.localcoupon.couponservice.global.exception;
+package com.localcoupon.couponservice.common.exception;
 
 import org.springframework.http.HttpStatus;
 

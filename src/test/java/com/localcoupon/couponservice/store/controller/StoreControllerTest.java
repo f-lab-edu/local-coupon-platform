@@ -2,7 +2,7 @@ package com.localcoupon.couponservice.store.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.localcoupon.couponservice.auth.interceptor.AuthInterceptor;
+import com.localcoupon.couponservice.auth.filter.AuthFilter;
 import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
 import com.localcoupon.couponservice.store.dto.response.StoreResponseDto;
 import com.localcoupon.couponservice.store.enums.StoreCategory;
@@ -13,7 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -34,22 +35,20 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(RestDocumentationExtension.class)
-@WebMvcTest(StoreController.class)
-@Import(AuthInterceptor.class)
+@WebMvcTest(controllers = StoreController.class,
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = AuthFilter.class)
+        })
 public class StoreControllerTest {
 
     @MockBean
     private StoreService storeService;
-
-    @MockBean
-    private AuthInterceptor authInterceptor;
 
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
-        when(authInterceptor.preHandle(any(), any(), any())).thenReturn(true);
         this.objectMapper.findAndRegisterModules();
         this.objectMapper.registerModule(new JavaTimeModule());
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)

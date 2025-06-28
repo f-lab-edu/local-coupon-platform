@@ -1,7 +1,7 @@
-package com.localcoupon.couponservice.global.exception;
+package com.localcoupon.couponservice.common.exception;
 
-import com.localcoupon.couponservice.global.CommonErrorCode;
-import com.localcoupon.couponservice.global.dto.response.ErrorResponse;
+import com.localcoupon.couponservice.common.CommonErrorCode;
+import com.localcoupon.couponservice.common.dto.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -47,6 +47,6 @@ public class GlobalExceptionHandler {
         log.error("[UNEXPECTED] {}", e.getMessage(), e);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ErrorResponse.of(CommonErrorCode.BAD_REQUEST));
+                .body(ErrorResponse.of(CommonErrorCode.SERVER_ERROR));
     }
 }

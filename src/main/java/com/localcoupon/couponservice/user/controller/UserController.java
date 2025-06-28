@@ -1,15 +1,15 @@
 package com.localcoupon.couponservice.user.controller;
 
-import com.localcoupon.couponservice.auth.context.AuthContextHolder;
-import com.localcoupon.couponservice.global.constants.ApiMapping;
-import static com.localcoupon.couponservice.global.constants.ApiMapping.API_Prefix;
-
-import com.localcoupon.couponservice.global.dto.response.SuccessResponse;
+import com.localcoupon.couponservice.common.constants.ApiMapping;
+import com.localcoupon.couponservice.common.dto.response.SuccessResponse;
 import com.localcoupon.couponservice.user.dto.request.SignUpRequestDto;
 import com.localcoupon.couponservice.user.dto.response.UserResponseDto;
 import com.localcoupon.couponservice.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import static com.localcoupon.couponservice.common.constants.ApiMapping.API_Prefix;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,8 +19,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public SuccessResponse<UserResponseDto> getUser() {
-        String userEmail = AuthContextHolder.getUserKey(); //TODO : 스프링 시큐리티 도입 시 수정
+    public SuccessResponse<UserResponseDto> getUser(@AuthenticationPrincipal String userEmail) {
         return SuccessResponse.of(userService.getUserByEmail(userEmail));
     }
 
