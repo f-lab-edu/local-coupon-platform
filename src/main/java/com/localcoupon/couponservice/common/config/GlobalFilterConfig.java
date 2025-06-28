@@ -1,6 +1,6 @@
-package com.localcoupon.couponservice.global.config;
+package com.localcoupon.couponservice.common.config;
 
-import com.localcoupon.couponservice.global.util.StringUtils;
+import com.localcoupon.couponservice.common.util.StringUtils;
 import jakarta.servlet.Filter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

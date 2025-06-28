@@ -1,7 +1,8 @@
-package com.localcoupon.couponservice.global.dto;
+package com.localcoupon.couponservice.common.dto;
 
-import com.localcoupon.couponservice.auth.context.AuthContextHolder;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 public record LogContext(
         String userId,
@@ -13,9 +14,8 @@ public record LogContext(
 ) {
 
     public static LogContext of(HttpServletRequest request, String action, Throwable e) {
-        String userId = AuthContextHolder.getUserKey();
         return new LogContext(
-                userId,
+                getUserIdFromSecurityContext(),
                 request.getRequestURI(),
                 request.getMethod(),
                 extractClientIp(request),
@@ -30,5 +30,16 @@ public record LogContext(
             return forwarded.split(",")[0].trim();
         }
         return request.getRemoteAddr();
+    }
+
+    private static String getUserIdFromSecurityContext() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            Object principal = auth.getPrincipal();
+            if (principal instanceof String) {
+                return (String) principal;
+            }
+        }
+        return "NO_AUTH";
     }
 }

@@ -1,4 +1,4 @@
-package com.localcoupon.couponservice.global.constants;
+package com.localcoupon.couponservice.common.constants;
 
 public final class ApiMapping {
     public static final String USER = "/users";

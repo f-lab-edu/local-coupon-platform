@@ -39,7 +39,11 @@ dependencies {
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 	// Argon2 암호화 의존성
 	implementation 'de.mkammerer:argon2-jvm:2.11'
+	// Spring Seucirty
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
 }
+
 ext {
 	snippetsDir = file('build/generated-snippets')
 }

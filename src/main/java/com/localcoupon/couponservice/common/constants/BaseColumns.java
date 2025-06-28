@@ -1,4 +1,4 @@
-package com.localcoupon.couponservice.global.constants;
+package com.localcoupon.couponservice.common.constants;
 
 public final class BaseColumns {
     public static final String CREATED_AT = "created_at";

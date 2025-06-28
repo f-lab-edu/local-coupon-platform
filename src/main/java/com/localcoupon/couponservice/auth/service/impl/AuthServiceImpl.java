@@ -1,14 +1,19 @@
 package com.localcoupon.couponservice.auth.service.impl;
 
-import com.localcoupon.couponservice.auth.context.AuthContextHolder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.localcoupon.couponservice.auth.dto.UserSessionDto;
 import com.localcoupon.couponservice.auth.dto.request.LoginRequestDto;
 import com.localcoupon.couponservice.auth.dto.response.LoginResponseDto;
 import com.localcoupon.couponservice.auth.dto.response.LogoutResponseDto;
 import com.localcoupon.couponservice.auth.enums.AuthErrorCode;
 import com.localcoupon.couponservice.auth.exception.PasswordNotMatchException;
 import com.localcoupon.couponservice.auth.service.AuthService;
-import com.localcoupon.couponservice.global.util.PasswordEncoder;
-import com.localcoupon.couponservice.global.util.TokenGenerator;
+import com.localcoupon.couponservice.common.CommonErrorCode;
+import com.localcoupon.couponservice.common.exception.JsonSerializeException;
+import com.localcoupon.couponservice.common.util.PasswordEncoder;
+import com.localcoupon.couponservice.common.util.RedisUtils;
+import com.localcoupon.couponservice.common.util.TokenGenerator;
 import com.localcoupon.couponservice.user.entity.User;
 import com.localcoupon.couponservice.user.enums.UserErrorCode;
 import com.localcoupon.couponservice.user.exception.UserNotFoundException;
@@ -17,17 +22,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    private static final String REDIS_SESSION_PREFIX = "SESSION:";
-
     private final UserRepository userRepository;
     private final StringRedisTemplate redisTemplate;
-    private final Duration SESSION_TTL = Duration.ofHours(1); // 1시간 TTL
+    private final ObjectMapper objectMapper;
 
+    @Override
     public LoginResponseDto login(LoginRequestDto request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
@@ -36,25 +40,30 @@ public class AuthServiceImpl implements AuthService {
             throw new PasswordNotMatchException(AuthErrorCode.PASSWORD_NOT_MATCHING);
         }
 
-        //TODO: 안전한 토큰으로 전환 필요
         String sessionToken = TokenGenerator.createSessionToken();
-        redisTemplate.opsForValue().set(REDIS_SESSION_PREFIX + sessionToken, user.getEmail(), SESSION_TTL);
-        return new LoginResponseDto(sessionToken);
-    }
 
-    public LogoutResponseDto logout(String sessionToken) {
-        redisTemplate.delete(REDIS_SESSION_PREFIX + sessionToken);
-        return new LogoutResponseDto(sessionToken);
-    }
+        // UserSessionDto 생성
+        UserSessionDto sessionDto = new UserSessionDto(
+                user.getEmail(),
+                List.of(user.getRole().name())
+        );
 
-    public String getUserEmailByToken(String sessionToken) {
-        String userEmail = redisTemplate.opsForValue().get(REDIS_SESSION_PREFIX + sessionToken);
-        return String.valueOf(userEmail);
+        try {
+            redisTemplate.opsForValue().set(
+                    RedisUtils.SESSION_PREFIX + sessionToken,
+                    objectMapper.writeValueAsString(sessionDto),
+                    RedisUtils.SESSION_TTL
+            );
+        } catch (JsonProcessingException e) {
+            throw new JsonSerializeException(CommonErrorCode.JSON_SERIALIZE_ERROR);
+        }
+
+        return LoginResponseDto.of(sessionToken);
     }
 
     @Override
-    public String getCurrentUserEmail() {
-        return AuthContextHolder.getUserKey();
+    public LogoutResponseDto logout(String sessionToken) {
+        redisTemplate.delete(RedisUtils.SESSION_PREFIX + sessionToken);
+        return new LogoutResponseDto(sessionToken);
     }
 }
-

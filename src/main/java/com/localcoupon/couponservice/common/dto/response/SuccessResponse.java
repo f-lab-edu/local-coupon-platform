@@ -1,5 +1,5 @@
-package com.localcoupon.couponservice.global.dto.response;
-import com.localcoupon.couponservice.global.util.StringUtils;
+package com.localcoupon.couponservice.common.dto.response;
+import com.localcoupon.couponservice.common.util.StringUtils;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
