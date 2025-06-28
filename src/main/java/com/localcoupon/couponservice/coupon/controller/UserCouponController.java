@@ -2,8 +2,8 @@ package com.localcoupon.couponservice.coupon.controller;
 
 import com.localcoupon.couponservice.coupon.dto.response.UserIssuedCouponResponseDto;
 import com.localcoupon.couponservice.coupon.service.UserCouponService;
-import com.localcoupon.couponservice.global.constants.ApiMapping;
-import com.localcoupon.couponservice.global.dto.response.SuccessResponse;
+import com.localcoupon.couponservice.common.constants.ApiMapping;
+import com.localcoupon.couponservice.common.dto.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

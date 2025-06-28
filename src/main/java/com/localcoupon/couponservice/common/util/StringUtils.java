@@ -1,4 +1,4 @@
-package com.localcoupon.couponservice.global.util;
+package com.localcoupon.couponservice.common.util;
 
 public class StringUtils {
     public static boolean isNotEmpty(String value) {

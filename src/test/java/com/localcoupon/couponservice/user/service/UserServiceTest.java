@@ -1,6 +1,6 @@
 package com.localcoupon.couponservice.user.service;
 
-import com.localcoupon.couponservice.global.util.PasswordEncoder;
+import com.localcoupon.couponservice.common.util.PasswordEncoder;
 import com.localcoupon.couponservice.user.dto.request.SignUpRequestDto;
 import com.localcoupon.couponservice.user.dto.response.UserResponseDto;
 import com.localcoupon.couponservice.user.entity.User;

@@ -1,6 +1,6 @@
-package com.localcoupon.couponservice.global.entity;
+package com.localcoupon.couponservice.common.entity;
 
-import com.localcoupon.couponservice.global.constants.BaseColumns;
+import com.localcoupon.couponservice.common.constants.BaseColumns;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

@@ -1,6 +1,6 @@
-package com.localcoupon.couponservice.global.dto.response;
+package com.localcoupon.couponservice.common.dto.response;
 
-import com.localcoupon.couponservice.global.exception.ErrorCode;
+import com.localcoupon.couponservice.common.exception.ErrorCode;
 import lombok.Getter;
 
 @Getter

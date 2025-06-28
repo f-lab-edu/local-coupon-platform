@@ -1,6 +1,6 @@
-package com.localcoupon.couponservice.global.util;
+package com.localcoupon.couponservice.common.util;
 
-import com.localcoupon.couponservice.global.dto.LogContext;
+import com.localcoupon.couponservice.common.dto.LogContext;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
