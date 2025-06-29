@@ -1,11 +1,11 @@
 package com.localcoupon.couponservice.coupon.controller;
 
+import com.localcoupon.couponservice.common.constants.ApiMapping;
+import com.localcoupon.couponservice.common.dto.response.SuccessResponse;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponVerifyResponseDto;
 import com.localcoupon.couponservice.coupon.service.CouponManageService;
-import com.localcoupon.couponservice.common.constants.ApiMapping;
-import com.localcoupon.couponservice.common.dto.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
