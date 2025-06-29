@@ -2,6 +2,7 @@ package com.localcoupon.couponservice.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.localcoupon.couponservice.auth.dto.UserSessionDto;
+import com.localcoupon.couponservice.common.config.SecurityConfig;
 import com.localcoupon.couponservice.common.util.RedisUtils;
 import com.localcoupon.couponservice.common.util.StringUtils;
 import com.localcoupon.couponservice.user.enums.UserErrorCode;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +41,12 @@ public class AuthFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+
+        if (Arrays.asList(SecurityConfig.NO_AUTH_APIS).contains(request.getRequestURI())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         extractSessionId(request.getHeader(AUTH_HEADER))
                 .ifPresent(this::validateSession);
 

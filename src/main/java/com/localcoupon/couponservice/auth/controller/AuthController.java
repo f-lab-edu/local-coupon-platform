@@ -9,11 +9,9 @@ import com.localcoupon.couponservice.common.dto.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import static com.localcoupon.couponservice.common.constants.ApiMapping.API_Prefix;
-
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(API_Prefix.API_V1 + ApiMapping.AUTH)
+@RequestMapping(ApiMapping.AUTH)
 public class AuthController {
     private final AuthService authService;
 

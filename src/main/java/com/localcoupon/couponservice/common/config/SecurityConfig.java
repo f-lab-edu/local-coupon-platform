@@ -28,7 +28,7 @@ public class SecurityConfig {
 
     public static final String[] NO_AUTH_APIS = {
             "/api/v1/auth/login",
-            "/api/v1/user"
+            "/api/v1/users/signup"
     };
 
     @Bean
