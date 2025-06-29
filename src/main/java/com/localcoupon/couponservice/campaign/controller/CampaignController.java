@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(ApiMapping.API_Prefix.API_V1 + ApiMapping.CAMPAIGN)
+@RequestMapping(ApiMapping.CAMPAIGN)
 public class CampaignController {
 
     private final CampaignService campaignService;

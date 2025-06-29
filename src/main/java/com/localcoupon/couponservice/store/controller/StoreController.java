@@ -1,6 +1,5 @@
 package com.localcoupon.couponservice.store.controller;
 
-import com.localcoupon.couponservice.auth.context.AuthContextHolder;
 import com.localcoupon.couponservice.common.constants.ApiMapping;
 import com.localcoupon.couponservice.common.dto.response.SuccessResponse;
 import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
@@ -13,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(ApiMapping.API_Prefix.API_V1 + ApiMapping.STORE)
+@RequestMapping(ApiMapping.STORE)
 public class StoreController {
 
     private final StoreService storeService;
@@ -28,7 +27,6 @@ public class StoreController {
     // 🧾 점주 | GET | /api/stores/my | 내 매장 목록
     @GetMapping("/my")
     public SuccessResponse<List<StoreResponseDto>> getMyStores() {
-        String ownerEmail = AuthContextHolder.getUserKey();
         List<StoreResponseDto> stores = storeService.getMyStores();
         return SuccessResponse.of(stores);
     }
