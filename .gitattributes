@@ -1,3 +1,4 @@
+/api-docs.html linguist-vendored
 /gradlew text eol=lf
 *.bat text eol=crlf
 *.jar binary
