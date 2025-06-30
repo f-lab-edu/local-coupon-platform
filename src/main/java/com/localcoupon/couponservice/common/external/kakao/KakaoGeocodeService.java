@@ -1,7 +1,7 @@
 package com.localcoupon.couponservice.common.external.kakao;
 
 import com.localcoupon.couponservice.common.external.KakaoGeocodeFeignClient;
-import com.localcoupon.couponservice.common.external.kakao.dto.KakaoGeocodeResponse;
+import com.localcoupon.couponservice.common.external.kakao.dto.KakaoGeocodeInfoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class KakaoGeocodeService {
     private final KakaoGeocodeFeignClient kakaoGeocodeFeignClient;
 
-    public KakaoGeocodeResponse geocode(String address) {
-        return kakaoGeocodeFeignClient.searchAddress(address);
+    public KakaoGeocodeInfoDto geocode(String address) {
+        return KakaoGeocodeInfoDto.from(kakaoGeocodeFeignClient.searchAddress(address));
     }
 }
