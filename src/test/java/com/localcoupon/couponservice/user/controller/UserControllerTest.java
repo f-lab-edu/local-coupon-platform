@@ -78,7 +78,7 @@ class UserControllerTest {
 
         String json = objectMapper.writeValueAsString(requestDto);
 
-        mockMvc.perform(post("/api/v1/users")
+        mockMvc.perform(post("/api/v1/users/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())

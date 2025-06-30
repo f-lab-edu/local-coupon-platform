@@ -44,7 +44,9 @@ public class AuthServiceImpl implements AuthService {
 
         // UserSessionDto 생성
         UserSessionDto sessionDto = new UserSessionDto(
+                user.getId(),
                 user.getEmail(),
+                user.getNickname(),
                 List.of(user.getRole().name())
         );
 
