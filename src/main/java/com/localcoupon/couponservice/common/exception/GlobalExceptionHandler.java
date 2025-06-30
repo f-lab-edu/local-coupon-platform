@@ -6,14 +6,29 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.sql.SQLException;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e) {
+        String detailMessage = e.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> String.format("[%s] %s", error.getField(), error.getDefaultMessage()))
+                .collect(Collectors.joining(" | "));
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(CommonErrorCode.BAD_REQUEST, detailMessage));
+    }
 
     // 커스텀 예외(BaseException) 처리
     @ExceptionHandler(BaseException.class)
