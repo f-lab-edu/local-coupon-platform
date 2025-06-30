@@ -17,14 +17,12 @@ public class StoreController {
 
     private final StoreService storeService;
 
-    // 🧾 점주 | POST | /api/stores | 내 매장 등록
     @PostMapping
     public SuccessResponse<StoreResponseDto> registerStore(@RequestBody StoreRequestDto request) {
         StoreResponseDto response = storeService.registerStore(request);
         return SuccessResponse.of(response);
     }
 
-    // 🧾 점주 | GET | /api/stores/my | 내 매장 목록
     @GetMapping("/my")
     public SuccessResponse<List<StoreResponseDto>> getMyStores() {
         List<StoreResponseDto> stores = storeService.getMyStores();
