@@ -2,6 +2,7 @@ package com.localcoupon.couponservice.auth.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.localcoupon.couponservice.auth.dto.UserSessionDto;
+import com.localcoupon.couponservice.auth.security.CustomUserDetails;
 import com.localcoupon.couponservice.common.config.SecurityConfig;
 import com.localcoupon.couponservice.common.util.RedisUtils;
 import com.localcoupon.couponservice.common.util.StringUtils;
@@ -86,11 +87,20 @@ public class AuthFilter extends OncePerRequestFilter {
                 .map(SimpleGrantedAuthority::new)
                 .toList();
 
+        // CustomUserDetails 생성
+        CustomUserDetails customUserDetails = new CustomUserDetails(
+                sessionDto.id(),
+                sessionDto.email(),
+                sessionDto.nickname(),
+                authorities
+        );
+
+        //SeucirtyContextHolder에 유저세션 정보 세팅
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
-                        sessionDto.email(), //TODO : CustomUserDetails로 대체?
+                        customUserDetails,
                         null,
-                        authorities
+                        customUserDetails.getAuthorities()
                 );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
