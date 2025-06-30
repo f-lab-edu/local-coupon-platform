@@ -1,5 +1,7 @@
 package com.localcoupon.couponservice.store.entity;
 
+import com.localcoupon.couponservice.common.external.kakao.dto.KakaoGeocodeInfoDto;
+import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
 import com.localcoupon.couponservice.store.enums.StoreCategory;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
@@ -18,11 +20,28 @@ import java.time.LocalDateTime;
 @Builder
 public class Store {
 
+    public Store(StoreRequestDto request,
+                 KakaoGeocodeInfoDto geoCodeInfo,
+                 Long ownerId,
+                 String imageUrl) {
+        this.ownerId = ownerId;
+        this.name = request.name();
+        this.address = request.address();
+        this.category = request.category();
+        this.regionCode = geoCodeInfo.regionCode();
+        this.latitude = geoCodeInfo.latitude();
+        this.longitude = geoCodeInfo.longitude();
+        this.phoneNumber = request.phoneNumber();
+        this.description = request.description();
+        this.imageUrl = imageUrl;
+    }
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "owner_id")
+    @Column
     @NotNull
     private Long ownerId;
 
@@ -71,5 +90,14 @@ public class Store {
 
     @Column
     private Boolean isDeleted;
+
+    public static Store from(
+            StoreRequestDto request,
+            KakaoGeocodeInfoDto geocodeInfo,
+            Long ownerId,
+            String imageUrl
+    ) {
+        return new Store(request,geocodeInfo,ownerId,imageUrl);
+    }
 }
 
