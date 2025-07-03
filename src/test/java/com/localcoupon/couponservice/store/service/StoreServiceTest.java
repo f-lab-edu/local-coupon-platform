@@ -19,7 +19,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,8 +76,6 @@ class StoreServiceTest {
                 .imageUrl("http://example.com/image.jpg")
                 .latitude(new BigDecimal("37.4979"))
                 .longitude(new BigDecimal("127.0276"))
-                .createdAt(LocalDateTime.of(2025, 6, 1, 10, 0))
-                .updatedAt(LocalDateTime.of(2025, 6, 1, 10, 0))
                 .build();
 
         given(userRepository.findIdByEmail(email)).willReturn(Optional.of(userId));
@@ -137,8 +134,6 @@ class StoreServiceTest {
                 .phoneNumber("02-1234-5678")
                 .description("커피 전문점")
                 .imageUrl("http://example.com/image.jpg")
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
                 .build();
 
         given(userRepository.findIdByEmail(email)).willReturn(Optional.of(userId));
@@ -174,8 +169,6 @@ class StoreServiceTest {
                 .phoneNumber("02-1234-5678")
                 .description("커피 전문점")
                 .imageUrl("http://example.com/image.jpg")
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
                 .build();
 
         given(storeRepository.findByLatLngRange(any(), any(), any(), any()))

@@ -2,6 +2,7 @@ package com.localcoupon.couponservice.common.exception;
 
 import com.localcoupon.couponservice.common.CommonErrorCode;
 import com.localcoupon.couponservice.common.dto.response.ErrorResponse;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -30,10 +31,17 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(CommonErrorCode.BAD_REQUEST, detailMessage));
     }
 
+    // 엔티티 처리
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(CommonErrorCode.ENTITY_NOT_FOUND_ERROR));
+    }
+
     // 커스텀 예외(BaseException) 처리
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<ErrorResponse> handleBaseException(BaseException e) {
-        log.warn("[BaseException] {} - {}", e.getErrorCode().getCode(), e.getMessage());
         return ResponseEntity
                 .status(e.getHttpStatus())
                 .body(ErrorResponse.of(e.getErrorCode()));
@@ -42,7 +50,6 @@ public class GlobalExceptionHandler {
     // 잘못된 인자, 검증 오류 등 처리
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
-        log.warn("[IllegalArgumentException] {}", e.getMessage(), e);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of(CommonErrorCode.BAD_REQUEST));
