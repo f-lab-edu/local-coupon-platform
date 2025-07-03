@@ -12,7 +12,7 @@ import com.localcoupon.couponservice.auth.service.AuthService;
 import com.localcoupon.couponservice.common.CommonErrorCode;
 import com.localcoupon.couponservice.common.exception.JsonSerializeException;
 import com.localcoupon.couponservice.common.util.PasswordEncoder;
-import com.localcoupon.couponservice.common.util.RedisUtils;
+import com.localcoupon.couponservice.common.infra.RedisConstants;
 import com.localcoupon.couponservice.common.util.TokenGenerator;
 import com.localcoupon.couponservice.user.entity.User;
 import com.localcoupon.couponservice.user.enums.UserErrorCode;
@@ -21,6 +21,8 @@ import com.localcoupon.couponservice.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -40,11 +42,19 @@ public class AuthServiceImpl implements AuthService {
 
         String sessionToken = TokenGenerator.createSessionToken();
 
+        // UserSessionDto 생성
+        UserSessionDto sessionDto = new UserSessionDto(
+                user.getId(),
+                user.getEmail(),
+                user.getNickname(),
+                List.of(user.getRole().name())
+        );
+
         try {
             redisTemplate.opsForValue().set(
-                    RedisUtils.SESSION_PREFIX + sessionToken,
-                    objectMapper.writeValueAsString(UserSessionDto.of(user)),
-                    RedisUtils.SESSION_TTL
+                    RedisConstants.SESSION_PREFIX + sessionToken,
+                    objectMapper.writeValueAsString(sessionDto),
+                    RedisConstants.SESSION_TTL
             );
         } catch (JsonProcessingException e) {
             throw new JsonSerializeException(CommonErrorCode.JSON_SERIALIZE_ERROR);
@@ -55,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LogoutResponseDto logout(String sessionToken) {
-        redisTemplate.delete(RedisUtils.SESSION_PREFIX + sessionToken);
+        redisTemplate.delete(RedisConstants.SESSION_PREFIX + sessionToken);
         return new LogoutResponseDto(sessionToken);
     }
 }

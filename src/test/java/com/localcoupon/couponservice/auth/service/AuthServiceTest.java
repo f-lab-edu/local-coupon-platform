@@ -7,7 +7,7 @@ import com.localcoupon.couponservice.auth.dto.response.LoginResponseDto;
 import com.localcoupon.couponservice.auth.exception.PasswordNotMatchException;
 import com.localcoupon.couponservice.auth.service.impl.AuthServiceImpl;
 import com.localcoupon.couponservice.common.util.PasswordEncoder;
-import com.localcoupon.couponservice.common.util.RedisUtils;
+import com.localcoupon.couponservice.common.infra.RedisConstants;
 import com.localcoupon.couponservice.user.entity.User;
 import com.localcoupon.couponservice.user.enums.UserRole;
 import com.localcoupon.couponservice.user.exception.UserNotFoundException;
@@ -93,7 +93,7 @@ public class AuthServiceTest {
         String expectedJson = objectMapper.writeValueAsString(expectedSession);
 
         verify(redisTemplate.opsForValue())
-                .set(startsWith(RedisUtils.SESSION_PREFIX),
+                .set(startsWith(RedisConstants.SESSION_PREFIX),
                         eq(expectedJson),
                         any(Duration.class));
     }
