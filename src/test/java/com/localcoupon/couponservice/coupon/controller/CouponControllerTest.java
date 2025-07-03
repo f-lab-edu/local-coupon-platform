@@ -5,7 +5,7 @@ import com.localcoupon.couponservice.auth.filter.AuthFilter;
 import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
 import com.localcoupon.couponservice.coupon.dto.response.UserIssuedCouponResponseDto;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
-import com.localcoupon.couponservice.coupon.service.CouponService;
+import com.localcoupon.couponservice.coupon.service.UserCouponService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,7 +45,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CouponControllerTest {
 
     @MockBean
-    private CouponService couponService;
+    private UserCouponService couponService;
 
     @MockBean
     private StringRedisTemplate redisTemplate;
