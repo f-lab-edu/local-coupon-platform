@@ -5,11 +5,13 @@ import com.localcoupon.couponservice.common.constants.ApiMapping;
 import com.localcoupon.couponservice.common.dto.response.SuccessResponse;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
-import com.localcoupon.couponservice.coupon.dto.response.CouponVerifyResponseDto;
 import com.localcoupon.couponservice.coupon.service.CouponManageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,10 +23,5 @@ public class CouponManageController {
     @PostMapping("/coupons")
     public SuccessResponse<CouponResponseDto> createCoupon(@RequestBody CouponCreateRequestDto request, @AuthenticationPrincipal CustomUserDetails user) {
         return SuccessResponse.of(couponManageService.createCoupon(request, user.getId()));
-    }
-
-    @PatchMapping("/user-coupons/verify")
-    public SuccessResponse<CouponVerifyResponseDto> verifyCoupon(@RequestBody String couponToken) {
-        return SuccessResponse.of(couponManageService.verifyCoupon(couponToken));
     }
 }
