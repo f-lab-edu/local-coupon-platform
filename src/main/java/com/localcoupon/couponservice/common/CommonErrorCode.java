@@ -8,7 +8,8 @@ public enum CommonErrorCode implements ErrorCode {
     SERVER_ERROR("서버 에러 입니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     DATABASE_ERROR("데이터베이스 처리 중 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     JSON_SERIALIZE_ERROR("JSON 직렬화에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    GEO_LOCATION_ERROR("좌표정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST);
+    GEO_LOCATION_ERROR("좌표정보가 올바르지 않습니다.", HttpStatus.BAD_REQUEST),
+    ENTITY_NOT_FOUND_ERROR("엔티티 정보가 없습니다.", HttpStatus.NO_CONTENT);
 
     private final String message;
     private final HttpStatus status;

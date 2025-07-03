@@ -66,6 +66,8 @@ class CouponManageControllerTest {
                 CouponScope.NATIONAL,
                 100,
                 LocalDateTime.of(2025, 7, 1, 0, 0),
+                LocalDateTime.of(2025, 7, 2, 0, 0),
+                LocalDateTime.of(2025, 7, 1, 0, 0),
                 LocalDateTime.of(2025, 7, 2, 0, 0)
         );
 
@@ -81,7 +83,7 @@ class CouponManageControllerTest {
                 "스타벅스 강남점"
         );
 
-        when(couponManageService.createCoupon(any(CouponCreateRequestDto.class))).thenReturn(responseDto);
+        when(couponManageService.createCoupon(any(CouponCreateRequestDto.class), any(Long.class))).thenReturn(responseDto);
 
         String json = objectMapper.writeValueAsString(requestDto);
 
