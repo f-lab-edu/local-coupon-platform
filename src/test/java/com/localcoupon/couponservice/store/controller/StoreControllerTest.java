@@ -67,7 +67,6 @@ class StoreControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "test@naver.com")
     @DisplayName("매장 등록 API")
     void registerStore() throws Exception {
         StoreRequestDto requestDto = new StoreRequestDto(
