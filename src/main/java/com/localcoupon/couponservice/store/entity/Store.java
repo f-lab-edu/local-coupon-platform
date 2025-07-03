@@ -1,6 +1,8 @@
 package com.localcoupon.couponservice.store.entity;
 
+import com.localcoupon.couponservice.common.entity.BaseEntity;
 import com.localcoupon.couponservice.common.external.kakao.dto.KakaoGeocodeInfoDto;
+import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
 import com.localcoupon.couponservice.store.enums.StoreCategory;
 import jakarta.persistence.*;
@@ -10,7 +12,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "store")
@@ -18,7 +20,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Store {
+public class Store extends BaseEntity {
 
     public Store(StoreRequestDto request,
                  KakaoGeocodeInfoDto geoCodeInfo,
@@ -82,14 +84,9 @@ public class Store {
     @Size(max=500)
     private String imageUrl;
 
-    @Column
-    private LocalDateTime createdAt;
+    @OneToMany(mappedBy = "store")
+    private List<Coupon> coupons;
 
-    @Column
-    private LocalDateTime updatedAt;
-
-    @Column
-    private Boolean isDeleted;
 
     public static Store from(
             StoreRequestDto request,
