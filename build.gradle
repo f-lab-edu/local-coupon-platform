@@ -51,6 +51,8 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	//FeignClient
 	implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
+	//Redisson
+	implementation 'org.redisson:redisson:3.27.2'
 }
 
 ext {
