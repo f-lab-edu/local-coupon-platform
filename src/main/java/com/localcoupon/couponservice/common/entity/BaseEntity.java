@@ -17,12 +17,16 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity {
     @CreatedDate
     @Column(name = BaseColumns.CREATED_AT, nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    protected LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(name = BaseColumns.UPDATED_AT, nullable = false)
-    private LocalDateTime updatedAt;
+    protected LocalDateTime updatedAt;
 
     @Column(name = BaseColumns.IS_DELETED, nullable = false)
-    private boolean isDeleted = false;
+    protected boolean isDeleted = false;
+
+    public void delete() {
+        this.isDeleted = true;
+    }
 }
