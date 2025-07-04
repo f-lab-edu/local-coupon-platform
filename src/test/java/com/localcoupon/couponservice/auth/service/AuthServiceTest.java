@@ -1,12 +1,15 @@
 package com.localcoupon.couponservice.auth.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.localcoupon.couponservice.auth.dto.UserSessionDto;
 import com.localcoupon.couponservice.auth.dto.request.LoginRequestDto;
+import com.localcoupon.couponservice.auth.dto.response.LoginResponseDto;
 import com.localcoupon.couponservice.auth.exception.PasswordNotMatchException;
 import com.localcoupon.couponservice.auth.service.impl.AuthServiceImpl;
-import com.localcoupon.couponservice.global.util.PasswordEncoder;
-import com.localcoupon.couponservice.global.util.RedisUtils;
-import com.localcoupon.couponservice.auth.dto.response.LoginResponseDto;
+import com.localcoupon.couponservice.common.util.PasswordEncoder;
+import com.localcoupon.couponservice.common.util.RedisUtils;
 import com.localcoupon.couponservice.user.entity.User;
+import com.localcoupon.couponservice.user.enums.UserRole;
 import com.localcoupon.couponservice.user.exception.UserNotFoundException;
 import com.localcoupon.couponservice.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,11 +21,14 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class AuthServiceTest {
 
@@ -37,35 +43,61 @@ public class AuthServiceTest {
     @Mock
     private ValueOperations<String, String> valueOperations;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        authService = new AuthServiceImpl(userRepository, redisTemplate);
+        authService = new AuthServiceImpl(userRepository, redisTemplate, objectMapper);
     }
 
     @Test
     @DisplayName("로그인 성공")
-    void loginSuccess() {
-        //given
+    void loginSuccess() throws Exception {
+        // given
         String email = "test@example.com";
         String rawPassword = "password123";
-        String hashedPassword = PasswordEncoder.encrypt(rawPassword);
+        Long userId = 123L;
+        String nickname = "dong";
 
         User user = User.builder()
+                .id(userId)
                 .email(email)
-                .passwordEnc(hashedPassword)
+                .passwordEnc(PasswordEncoder.encrypt(rawPassword))
+                .nickname(nickname)
+                .address("서울 송파구")
+                .regionCode("02146")
+                .role(UserRole.ROLE_USER)
                 .build();
-        //when
+
+
+
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
         LoginRequestDto requestDto = new LoginRequestDto(email, rawPassword);
+
+        // when
         LoginResponseDto response = authService.login(requestDto);
 
-        //then
+        // then
         assertThat(response.token()).isNotNull();
-        verify(redisTemplate.opsForValue()).set(startsWith(RedisUtils.SESSION_PREFIX), eq(email), any(Duration.class));
+
+        UserSessionDto expectedSession = new UserSessionDto(
+                userId,
+                email,
+                nickname,
+                List.of("ROLE_USER")
+        );
+
+        String expectedJson = objectMapper.writeValueAsString(expectedSession);
+
+        verify(redisTemplate.opsForValue())
+                .set(startsWith(RedisUtils.SESSION_PREFIX),
+                        eq(expectedJson),
+                        any(Duration.class));
     }
+
 
     @Test
     @DisplayName("로그인 실패 - 유저 없음")
@@ -95,9 +127,10 @@ public class AuthServiceTest {
                 .passwordEnc(PasswordEncoder.encrypt(correctPassword))
                 .build();
 
-        //when
         when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+
         LoginRequestDto requestDto = new LoginRequestDto(email, wrongPassword);
+
         //then
         assertThatThrownBy(() -> authService.login(requestDto))
                 .isInstanceOf(PasswordNotMatchException.class);
@@ -114,6 +147,6 @@ public class AuthServiceTest {
         authService.logout(sessionToken);
 
         //then
-        verify(redisTemplate).delete(redisKey); // 단순하게 한 번만 호출되는지 확인
+        verify(redisTemplate).delete(redisKey);
     }
 }

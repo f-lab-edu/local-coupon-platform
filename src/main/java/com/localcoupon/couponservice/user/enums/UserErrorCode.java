@@ -1,6 +1,6 @@
 package com.localcoupon.couponservice.user.enums;
 
-import com.localcoupon.couponservice.global.exception.ErrorCode;
+import com.localcoupon.couponservice.common.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 public enum UserErrorCode implements ErrorCode {

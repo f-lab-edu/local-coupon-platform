@@ -1,35 +1,45 @@
 package com.localcoupon.couponservice.store.controller;
 
-import com.localcoupon.couponservice.auth.context.AuthContextHolder;
-import com.localcoupon.couponservice.global.constants.ApiMapping;
-import com.localcoupon.couponservice.global.dto.response.SuccessResponse;
+import com.localcoupon.couponservice.auth.security.CustomUserDetails;
+import com.localcoupon.couponservice.common.constants.ApiMapping;
+import com.localcoupon.couponservice.common.dto.response.SuccessResponse;
 import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
+import com.localcoupon.couponservice.store.dto.request.UserStoreSearchRequestDto;
 import com.localcoupon.couponservice.store.dto.response.StoreResponseDto;
 import com.localcoupon.couponservice.store.service.StoreService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(ApiMapping.API_Prefix.API_V1 + ApiMapping.STORE)
+@RequestMapping(ApiMapping.STORE)
 public class StoreController {
 
     private final StoreService storeService;
 
-    // 🧾 점주 | POST | /api/stores | 내 매장 등록
     @PostMapping
-    public SuccessResponse<StoreResponseDto> registerStore(@RequestBody StoreRequestDto request) {
-        StoreResponseDto response = storeService.registerStore(request);
+    public SuccessResponse<StoreResponseDto> registerStore( @AuthenticationPrincipal CustomUserDetails userDetails,
+                                                           @RequestBody StoreRequestDto request) {
+        StoreResponseDto response = storeService.registerStore(request, userDetails.getEmail());
         return SuccessResponse.of(response);
     }
 
-    // 🧾 점주 | GET | /api/stores/my | 내 매장 목록
     @GetMapping("/my")
-    public SuccessResponse<List<StoreResponseDto>> getMyStores() {
-        String ownerEmail = AuthContextHolder.getUserKey();
-        List<StoreResponseDto> stores = storeService.getMyStores();
+    public SuccessResponse<List<StoreResponseDto>> getMyStores( @AuthenticationPrincipal CustomUserDetails userDetails) {
+        List<StoreResponseDto> stores = storeService.getMyStores(userDetails.getEmail());
         return SuccessResponse.of(stores);
     }
+
+    @GetMapping("/nearby")
+    public SuccessResponse<List<StoreResponseDto>>  getStoresNearby(
+            @ModelAttribute @Valid UserStoreSearchRequestDto request
+    ) {
+        List<StoreResponseDto> nearBystores = storeService.getStoresNearby(request);
+        return SuccessResponse.of(nearBystores);
+    }
+
 }
