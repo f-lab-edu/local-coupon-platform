@@ -1,10 +1,13 @@
 package com.localcoupon.couponservice.auth.security;
 
+import com.localcoupon.couponservice.auth.dto.UserSessionDto;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+
 @Getter
 public class CustomUserDetails implements UserDetails {
     private final Long id;
@@ -17,6 +20,13 @@ public class CustomUserDetails implements UserDetails {
         this.email = email;
         this.nickname = nickname;
         this.authorities = authorities;
+    }
+
+    public static CustomUserDetails from(UserSessionDto userSessionDto) {
+        return new CustomUserDetails(userSessionDto.id(), userSessionDto.email(), userSessionDto.nickname(),
+                userSessionDto.roles().stream()
+                .map(SimpleGrantedAuthority::new)
+                .toList());
     }
 
     @Override
@@ -53,4 +63,5 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }

@@ -1,8 +1,11 @@
 package com.localcoupon.couponservice.common.dto;
 
+import com.localcoupon.couponservice.auth.security.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.Optional;
 
 public record LogContext(
         String userId,
@@ -15,7 +18,7 @@ public record LogContext(
 
     public static LogContext of(HttpServletRequest request, String action, Throwable e) {
         return new LogContext(
-                getUserIdFromSecurityContext(),
+                getUserEmailFromSecurityContext(),
                 request.getRequestURI(),
                 request.getMethod(),
                 extractClientIp(request),
@@ -32,14 +35,13 @@ public record LogContext(
         return request.getRemoteAddr();
     }
 
-    private static String getUserIdFromSecurityContext() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated()) {
-            Object principal = auth.getPrincipal();
-            if (principal instanceof String) {
-                return (String) principal;
-            }
-        }
-        return "NO_AUTH";
+    private static String getUserEmailFromSecurityContext() {
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .filter(Authentication::isAuthenticated)
+                .map(Authentication::getPrincipal)
+                .filter(principal -> principal instanceof CustomUserDetails)
+                .map(principal -> ((CustomUserDetails) principal).getEmail())
+                .map(String::valueOf)
+                .orElse("NO_AUTH");
     }
 }
