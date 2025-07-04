@@ -16,14 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -49,22 +47,24 @@ public class AuthFilter extends OncePerRequestFilter {
         }
 
         extractSessionId(request.getHeader(AUTH_HEADER))
-                .ifPresent(this::validateSession);
+                .map(this::validateSession)
+                .ifPresent(auth ->
+                        SecurityContextHolder.getContext().setAuthentication(auth)
+                );
+
 
         filterChain.doFilter(request, response);
     }
 
     private Optional<String> extractSessionId(String authHeader) {
-        if (StringUtils.isNotEmpty(authHeader) && authHeader.startsWith(BEARER)) {
-            String sessionId = authHeader.substring(BEARER.length());
-            if (StringUtils.isNotEmpty(sessionId)) {
-                return Optional.of(sessionId);
-            }
-        }
-        return Optional.empty();
+        return Optional.ofNullable(authHeader)
+                .filter(header -> header.startsWith(BEARER))
+                .map(header -> header.substring(BEARER.length()))
+                .filter(StringUtils::hasText);
     }
 
-    private void validateSession(String sessionId) {
+
+    private UsernamePasswordAuthenticationToken validateSession(String sessionId) {
         String json = redisTemplate.opsForValue().get(RedisUtils.SESSION_PREFIX + sessionId);
         if (StringUtils.isEmpty(json)) {
             throw new InsufficientAuthenticationException(UserErrorCode.USER_NOT_FOUND.getMessage());
@@ -78,31 +78,18 @@ public class AuthFilter extends OncePerRequestFilter {
             throw new InsufficientAuthenticationException("[AuthFilter] 세션 정보를 파싱할 수 없습니다.");
         }
 
-        //시큐리티 정보 세팅
-        setSecurityContextHolder(sessionDto);
+        return createAuthenticationToken(sessionDto);
     }
 
-    private void setSecurityContextHolder(UserSessionDto sessionDto) {
-        List<SimpleGrantedAuthority> authorities = sessionDto.roles().stream()
-                .map(SimpleGrantedAuthority::new)
-                .toList();
 
+    private UsernamePasswordAuthenticationToken createAuthenticationToken(UserSessionDto sessionDto) {
         // CustomUserDetails 생성
-        CustomUserDetails customUserDetails = new CustomUserDetails(
-                sessionDto.id(),
-                sessionDto.email(),
-                sessionDto.nickname(),
-                authorities
-        );
-
-        //SeucirtyContextHolder에 유저세션 정보 세팅
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(
+        CustomUserDetails customUserDetails = CustomUserDetails.from(sessionDto);
+        //인증 완료 토큰 생성
+        return UsernamePasswordAuthenticationToken.authenticated(
                         customUserDetails,
                         null,
                         customUserDetails.getAuthorities()
                 );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

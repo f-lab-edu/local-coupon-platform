@@ -22,8 +22,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -42,18 +40,10 @@ public class AuthServiceImpl implements AuthService {
 
         String sessionToken = TokenGenerator.createSessionToken();
 
-        // UserSessionDto 생성
-        UserSessionDto sessionDto = new UserSessionDto(
-                user.getId(),
-                user.getEmail(),
-                user.getNickname(),
-                List.of(user.getRole().name())
-        );
-
         try {
             redisTemplate.opsForValue().set(
                     RedisUtils.SESSION_PREFIX + sessionToken,
-                    objectMapper.writeValueAsString(sessionDto),
+                    objectMapper.writeValueAsString(UserSessionDto.of(user)),
                     RedisUtils.SESSION_TTL
             );
         } catch (JsonProcessingException e) {

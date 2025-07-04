@@ -31,8 +31,8 @@ public class DataSourceConfig {
 
         config.setMaximumPoolSize(40);
         config.setMinimumIdle(10);
-        config.setIdleTimeout(0); //쉬는 커넥션
-        config.setMaxLifetime(180_000);
+        config.setIdleTimeout(300_000); // 커넥션이 5분동안 놀을 떄 (정리)
+        config.setMaxLifetime(180_000_0); // 커넥션 교체 시간 (항상 교체 작업) 30분)
         config.setConnectionTimeout(5000); //5초 대기
 
         config.setPoolName("LocalCouponHikariCP");
