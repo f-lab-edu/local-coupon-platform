@@ -1,0 +1,98 @@
+package com.localcoupon.couponservice.coupon.entity;
+
+import com.localcoupon.couponservice.common.entity.BaseEntity;
+import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
+import com.localcoupon.couponservice.coupon.enums.CouponScope;
+import com.localcoupon.couponservice.coupon.enums.CouponStock;
+import com.localcoupon.couponservice.store.entity.Store;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.validator.constraints.Length;
+
+import java.time.LocalDateTime;
+
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "coupon")
+public class Coupon extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_id")
+    private Store store;
+
+//    @ManyToOne(fetch = FetchType.LAZY) //TODO Campaign 작업 시 추가
+//    @JoinColumn(name = "campaign_id")
+//    private Campaign campaign;
+
+    @Enumerated(EnumType.STRING)
+    private CouponScope scope;
+
+    @Column
+    @Length(max = 200)
+    private String title;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "coupon_limit")
+    private Integer totalCount;
+
+    @Column(name = "coupon_issued_count")
+    private Integer issuedCount;
+
+    @Column(name = "coupon_valid_start_time")
+    private LocalDateTime couponValidStartTime;
+
+    @Column(name = "coupon_valid_end_time")
+    private LocalDateTime couponValidEndTime;
+
+    @Column(name = "coupon_issue_start_time")
+    private LocalDateTime couponIssueStartTime;
+
+    @Column(name = "coupon_issue_end_time")
+    private LocalDateTime couponIssueEndTime;
+
+    public Coupon(
+            CouponScope scope,
+            String title,
+            String description,
+            Integer totalCount,
+            Integer issuedCount,
+            LocalDateTime couponValidStartTime,
+            LocalDateTime couponValidEndTime,
+            LocalDateTime couponIssueStartTime,
+            LocalDateTime couponIssueEndTime
+    ) {
+        super();
+        this.scope = scope;
+        this.title = title;
+        this.description = description;
+        this.totalCount = totalCount;
+        this.issuedCount = issuedCount;
+        this.couponValidStartTime = couponValidStartTime;
+        this.couponValidEndTime = couponValidEndTime;
+        this.couponIssueStartTime = couponIssueStartTime;
+        this.couponIssueEndTime = couponIssueEndTime;
+    }
+
+
+    public static Coupon from(CouponCreateRequestDto request) {
+        return new Coupon(
+                request.scope(),
+                request.title(),
+                request.description(),
+                request.totalCount(),
+                CouponStock.INIT.getValue(),
+                request.couponValidStartTime(),
+                request.couponValidEndTime(),
+                request.couponIssueStartTime(),
+                request.couponIssueEndTime()
+        );
+    }
+}
+

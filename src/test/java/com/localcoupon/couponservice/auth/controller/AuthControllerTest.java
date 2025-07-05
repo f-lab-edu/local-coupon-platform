@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.localcoupon.couponservice.auth.dto.request.LoginRequestDto;
 import com.localcoupon.couponservice.auth.dto.response.LoginResponseDto;
 import com.localcoupon.couponservice.auth.dto.response.LogoutResponseDto;
-import com.localcoupon.couponservice.auth.interceptor.AuthInterceptor;
+import com.localcoupon.couponservice.auth.filter.AuthFilter;
 import com.localcoupon.couponservice.auth.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,10 +12,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -29,15 +31,14 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(RestDocumentationExtension.class)
-@WebMvcTest(AuthController.class)
-@Import(AuthInterceptor.class)
+@WebMvcTest(controllers = AuthController.class,
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = AuthFilter.class)
+        })
 class AuthControllerTest {
 
     @MockBean
     private AuthService authService;
-
-    @MockBean
-    private AuthInterceptor authInterceptor;
 
     private MockMvc mockMvc;
 
@@ -45,7 +46,6 @@ class AuthControllerTest {
 
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
-        when(authInterceptor.preHandle(any(), any(), any())).thenReturn(true);
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .apply(org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration(provider))
                 .build();
@@ -81,6 +81,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("로그아웃 API 문서화")
+    @WithMockUser(username = "test@example.com", roles = "USER")
     void logout() throws Exception {
         // given
         String token = "abcd-1234";

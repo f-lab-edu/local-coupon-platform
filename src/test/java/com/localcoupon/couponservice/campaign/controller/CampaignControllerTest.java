@@ -2,7 +2,7 @@ package com.localcoupon.couponservice.campaign.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.localcoupon.couponservice.auth.interceptor.AuthInterceptor;
+import com.localcoupon.couponservice.auth.filter.AuthFilter;
 import com.localcoupon.couponservice.campaign.dto.request.CampaignCreateRequestDto;
 import com.localcoupon.couponservice.campaign.dto.response.CampaignResponseDto;
 import com.localcoupon.couponservice.campaign.service.CampaignService;
@@ -12,7 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
@@ -35,15 +36,14 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(RestDocumentationExtension.class)
-@WebMvcTest(CampaignController.class)
-@Import(AuthInterceptor.class)
+@WebMvcTest(controllers = CampaignController.class,
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = AuthFilter.class)
+        })
 public class CampaignControllerTest {
 
     @MockBean
     private CampaignService campaignService;
-
-    @MockBean
-    private AuthInterceptor authInterceptor;
 
     @MockBean
     private StringRedisTemplate redisTemplate;
@@ -53,7 +53,6 @@ public class CampaignControllerTest {
 
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
-        when(authInterceptor.preHandle(any(), any(), any())).thenReturn(true);
         this.objectMapper.registerModule(new JavaTimeModule());
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .apply(org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration(provider))

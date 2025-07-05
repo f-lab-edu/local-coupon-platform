@@ -1,7 +1,7 @@
 package com.localcoupon.couponservice.coupon.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.localcoupon.couponservice.auth.interceptor.AuthInterceptor;
+import com.localcoupon.couponservice.auth.filter.AuthFilter;
 import com.localcoupon.couponservice.coupon.dto.response.UserIssuedCouponResponseDto;
 import com.localcoupon.couponservice.coupon.service.UserCouponService;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -21,34 +22,32 @@ import org.springframework.web.context.WebApplicationContext;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(RestDocumentationExtension.class)
-@WebMvcTest(UserCouponController.class)
-@Import(AuthInterceptor.class)
+@WebMvcTest(controllers = UserCouponController.class,
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = AuthFilter.class)
+        })
 class UserCouponControllerTest {
 
     @MockBean
     private UserCouponService userCouponService;
-
-    @MockBean
-    private AuthInterceptor authInterceptor;
 
     private MockMvc mockMvc;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
-        when(authInterceptor.preHandle(any(), any(), any())).thenReturn(true);
 
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .apply(org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration(provider))

@@ -1,7 +1,7 @@
 package com.localcoupon.couponservice.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.localcoupon.couponservice.auth.interceptor.AuthInterceptor;
+import com.localcoupon.couponservice.auth.filter.AuthFilter;
 import com.localcoupon.couponservice.auth.service.AuthService;
 import com.localcoupon.couponservice.user.dto.request.SignUpRequestDto;
 import com.localcoupon.couponservice.user.dto.response.UserResponseDto;
@@ -12,14 +12,20 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -31,8 +37,10 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(RestDocumentationExtension.class)
-@WebMvcTest(UserController.class)
-@Import({AuthInterceptor.class})
+@WebMvcTest(controllers = UserController.class,
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = AuthFilter.class)
+        })
 class UserControllerTest {
 
     @MockBean
@@ -41,21 +49,23 @@ class UserControllerTest {
     @MockBean
     private AuthService authService;
 
-    @MockBean
-    private AuthInterceptor authInterceptor;
-
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
-        // Interceptor 무시
-        when(authInterceptor.preHandle(any(), any(), any())).thenReturn(true);
-
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .apply(org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration(provider))
                 .build();
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        "test@example.com", // Principal (userEmail)
+                        null,
+                        List.of(new SimpleGrantedAuthority("USER_ROLE")) // 권한
+                )
+        );
     }
 
     @Test
@@ -68,7 +78,7 @@ class UserControllerTest {
 
         String json = objectMapper.writeValueAsString(requestDto);
 
-        mockMvc.perform(post("/api/v1/users")
+        mockMvc.perform(post("/api/v1/users/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())
@@ -100,11 +110,10 @@ class UserControllerTest {
         String email = "test@example.com";
         UserResponseDto responseDto = new UserResponseDto(email, "tester", "서울시", "110105");
 
-        when(authService.getCurrentUserEmail()).thenReturn(email);
         when(userService.getUserByEmail(any())).thenReturn(responseDto);
 
        mockMvc.perform(get("/api/v1/users/me")
-                        .header(HttpHeaders.AUTHORIZATION, "SESSION:abcd1234")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer abcd1234")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(document("user-get-me",

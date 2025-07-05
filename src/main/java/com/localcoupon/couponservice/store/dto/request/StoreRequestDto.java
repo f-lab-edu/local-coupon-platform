@@ -5,5 +5,8 @@ import com.localcoupon.couponservice.store.enums.StoreCategory;
 public record StoreRequestDto(
         String name,
         String address,
-        StoreCategory category
+        StoreCategory category,
+        String phoneNumber,
+        String description,
+        String imageUrl
 ) {}
