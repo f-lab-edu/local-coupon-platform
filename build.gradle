@@ -52,7 +52,7 @@ dependencies {
 	//FeignClient
 	implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
 	//Redisson
-	implementation 'org.redisson:redisson:3.27.2'
+	implementation 'org.redisson:redisson-spring-data-30:3.27.2'
 }
 
 ext {
