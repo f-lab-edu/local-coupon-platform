@@ -6,7 +6,8 @@ import org.springframework.http.HttpStatus;
 public enum UserCouponErrorCode implements ErrorCode {
     SOLD_OUT_COUPON("쿠폰이 모두 소진되었습니다.", HttpStatus.NO_CONTENT),
     INVALID_COUPON("쿠폰 유효기간이 만료되었습니다.", HttpStatus.BAD_REQUEST),
-    ENDED_COUPON_ISSUE("쿠폰 발급기간이 종료되었습니다.", HttpStatus.BAD_REQUEST);
+    ENDED_COUPON_ISSUE("쿠폰 발급기간이 종료되었습니다.", HttpStatus.BAD_REQUEST),
+    COUPON_LOCK_FAILED("쿠폰 락 처리에 실패하였습니다.", HttpStatus.CONFLICT);
 
     private final String message;
     private final HttpStatus status;

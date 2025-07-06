@@ -6,6 +6,7 @@ import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
 import com.localcoupon.couponservice.coupon.service.CouponCacheService;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -22,9 +23,10 @@ import static com.localcoupon.couponservice.common.infra.RedisConstants.COUPON_O
 public class CouponCacheServiceImpl implements CouponCacheService {
 
     private final RedisTemplate<String, Integer> redisTemplate;
+    private final RedissonClient redissonClient;
 
     @Override
-    public void saveCouponForOpen(Coupon coupon) {
+    public Coupon saveCouponForOpen(Coupon coupon) {
         String key = COUPON_OPEN_PREFIX + coupon.getId();
 
         redisTemplate.opsForValue().set(key, coupon.getTotalCount());
@@ -36,6 +38,8 @@ public class CouponCacheServiceImpl implements CouponCacheService {
         ).getSeconds();
 
         redisTemplate.expire(key, ttl, TimeUnit.SECONDS);
+
+        return coupon;
     }
 
     @Override
@@ -45,7 +49,7 @@ public class CouponCacheServiceImpl implements CouponCacheService {
     }
 
     @Override
-    public boolean decreaseCouponStock(Long couponId) {
+    public int decreaseCouponStock(Long couponId) {
         String key = COUPON_OPEN_PREFIX + couponId;
 
         String script = """
@@ -66,6 +70,6 @@ public class CouponCacheServiceImpl implements CouponCacheService {
             throw new UserCouponException(UserCouponErrorCode.SOLD_OUT_COUPON);
         }
 
-        return true;
+        return result;
     }
 }

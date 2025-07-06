@@ -106,10 +106,10 @@ class CouponCacheServiceTest {
                 .thenReturn(1);
 
         // when
-        boolean result = couponCacheService.decreaseCouponStock(couponId);
+        int result = couponCacheService.decreaseCouponStock(couponId);
 
         // then
-        assertThat(result).isTrue();
+        assertThat(result).isEqualTo(1);
     }
 
     private Coupon createCoupon() {
