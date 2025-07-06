@@ -8,5 +8,6 @@ public final class RedisConstants {
     public static final String SESSION_PREFIX = "SESSION:";
     public static final String COUPON_READY_PREFIX = "coupon:ready:";
     public static final String COUPON_OPEN_PREFIX = "coupon:open:";
+    public static final String COUPON_LOCK_PREFIX = "coupon:lock:";
 }
 

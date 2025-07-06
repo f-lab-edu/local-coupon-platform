@@ -8,9 +8,24 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericToStringSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 public class RedisConnectionConfig {
+
+    @Bean
+    public RedisTemplate<String, Integer> redisTemplate(
+            @Qualifier("redissonConnectionFactory") RedisConnectionFactory redissonConnectionFactory
+    ) {
+        RedisTemplate<String, Integer> template = new RedisTemplate<>();
+        template.setConnectionFactory(redissonConnectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericToStringSerializer<>(Integer.class));
+        return template;
+    }
+
 
     @Bean(name = "lettuceConnectionFactory")
     @Primary
