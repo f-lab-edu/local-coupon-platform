@@ -4,9 +4,9 @@ import com.localcoupon.couponservice.coupon.entity.Coupon;
 
 public interface CouponCacheService {
 
-    void saveCouponForOpen(Coupon coupon);
+    Coupon saveCouponForOpen(Coupon coupon);
 
     boolean isCouponOpen(Long couponId);
 
-    boolean decreaseCouponStock(Long couponId);
+    int decreaseCouponStock(Long couponId);
 }
