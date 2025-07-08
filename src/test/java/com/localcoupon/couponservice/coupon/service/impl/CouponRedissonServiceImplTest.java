@@ -5,6 +5,9 @@ import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
 import com.localcoupon.couponservice.coupon.infra.redis.RedisCouponRepository;
+import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
+import com.localcoupon.couponservice.store.entity.Store;
+import com.localcoupon.couponservice.store.enums.StoreCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -124,6 +127,14 @@ class CouponRedissonServiceTest {
     }
 
     private Coupon createCoupon() {
+        StoreRequestDto request = new StoreRequestDto(
+                "스타벅스",
+                "서울시 송파구 법원로 55",
+                StoreCategory.CAFE,
+                "02-1234-5678",
+                "매장 설명입니다.",
+                "http://example.com/image.jpg"
+        );
         return new Coupon(
                 CouponScope.LOCAL,
                 "Test Coupon",
@@ -133,7 +144,8 @@ class CouponRedissonServiceTest {
                 LocalDateTime.now(),
                 LocalDateTime.now().plusDays(7),
                 LocalDateTime.now(),
-                LocalDateTime.now().plusDays(7)
+                LocalDateTime.now().plusDays(7),
+                Store.from(request,null, 1L,"dd")
         );
     }
 }

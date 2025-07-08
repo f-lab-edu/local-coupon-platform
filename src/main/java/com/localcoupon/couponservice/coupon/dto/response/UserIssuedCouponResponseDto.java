@@ -10,7 +10,7 @@ public record UserIssuedCouponResponseDto(
         LocalDateTime couponValidStartTime,
         LocalDateTime couponValidEndTime,
         boolean isUsed,
-        String displayCode,
         String qrToken
-) {}
+) {
+}
 
