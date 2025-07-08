@@ -9,5 +9,6 @@ public final class RedisConstants {
     public static final String COUPON_READY_PREFIX = "coupon:ready:";
     public static final String COUPON_OPEN_PREFIX = "coupon:open:";
     public static final String COUPON_LOCK_PREFIX = "coupon:lock:";
+    public static final String DUPLICATE_REQUEST_LOCK = "DUPLICATE_REQUEST_LOCK";
 }
 

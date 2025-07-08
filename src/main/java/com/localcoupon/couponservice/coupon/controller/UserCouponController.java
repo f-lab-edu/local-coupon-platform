@@ -1,5 +1,6 @@
 package com.localcoupon.couponservice.coupon.controller;
 
+import com.localcoupon.couponservice.common.annotation.PreventDuplicateRequest;
 import com.localcoupon.couponservice.common.constants.ApiMapping;
 import com.localcoupon.couponservice.common.dto.response.SuccessResponse;
 import com.localcoupon.couponservice.coupon.dto.response.UserIssuedCouponResponseDto;
@@ -15,8 +16,7 @@ import java.util.List;
 public class UserCouponController {
 
     private final UserCouponService userCouponService;
-
-
+    @PreventDuplicateRequest
     @PostMapping("/{couponId}/issue")
     public SuccessResponse<UserIssuedCouponResponseDto> issueCoupon(@PathVariable Long couponId) {
         UserIssuedCouponResponseDto issuedCoupon = userCouponService.issueCoupon(couponId);
