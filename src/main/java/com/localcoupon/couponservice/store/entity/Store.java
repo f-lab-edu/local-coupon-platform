@@ -13,6 +13,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(name = "store")
@@ -24,8 +25,7 @@ public class Store extends BaseEntity {
 
     public Store(StoreRequestDto request,
                  KakaoGeocodeInfoDto geoCodeInfo,
-                 Long ownerId,
-                 String imageUrl) {
+                 Long ownerId) {
         this.ownerId = ownerId;
         this.name = request.name();
         this.address = request.address();
@@ -35,7 +35,7 @@ public class Store extends BaseEntity {
         this.longitude = geoCodeInfo.longitude();
         this.phoneNumber = request.phoneNumber();
         this.description = request.description();
-        this.imageUrl = imageUrl;
+        this.imageUrl = request.imageUrl();
     }
 
 
@@ -91,10 +91,12 @@ public class Store extends BaseEntity {
     public static Store from(
             StoreRequestDto request,
             KakaoGeocodeInfoDto geocodeInfo,
-            Long ownerId,
-            String imageUrl
+            Long ownerId
     ) {
-        return new Store(request,geocodeInfo,ownerId,imageUrl);
+        KakaoGeocodeInfoDto safeGeoCodeInfo = Optional.ofNullable(geocodeInfo)
+                .orElse(KakaoGeocodeInfoDto.of("UNKNOWN", BigDecimal.ZERO, BigDecimal.ZERO));
+
+        return new Store(request, safeGeoCodeInfo,ownerId);
     }
 }
 

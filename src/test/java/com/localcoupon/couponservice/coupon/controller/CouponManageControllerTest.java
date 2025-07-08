@@ -4,10 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.localcoupon.couponservice.auth.filter.AuthFilter;
 import com.localcoupon.couponservice.auth.security.CustomUserDetails;
+import com.localcoupon.couponservice.common.constants.ApiMapping;
+import com.localcoupon.couponservice.common.external.kakao.dto.KakaoGeocodeInfoDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.service.CouponManageService;
+import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
+import com.localcoupon.couponservice.store.dto.response.StoreResponseDto;
+import com.localcoupon.couponservice.store.entity.Store;
+import com.localcoupon.couponservice.store.enums.StoreCategory;
 import com.localcoupon.couponservice.user.enums.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,9 +34,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.localcoupon.couponservice.store.dto.StoreResponseFields.storeResponseFields;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -86,6 +94,25 @@ class CouponManageControllerTest {
                 LocalDateTime.of(2025, 7, 2, 0, 0)
         );
 
+        StoreRequestDto request = new StoreRequestDto(
+                "스타벅스",
+                "서울시 송파구 법원로 55",
+                StoreCategory.CAFE,
+                "02-1234-5678",
+                "매장 설명입니다.",
+                "http://example.com/image.jpg"
+        );
+
+        Store store = Store.from(
+                request,
+                new KakaoGeocodeInfoDto(
+                        "10010",
+                        new BigDecimal("36.2323"),
+                        new BigDecimal("126.3232")
+                ),
+                1L
+        );
+
         CouponResponseDto responseDto = new CouponResponseDto(
                 1L,
                 "봄맞이 할인",
@@ -95,14 +122,16 @@ class CouponManageControllerTest {
                 0,
                 LocalDateTime.of(2025, 7, 1, 0, 0),
                 LocalDateTime.of(2025, 7, 2, 0, 0),
-                "스타벅스 강남점"
+                LocalDateTime.of(2025, 7, 1, 0, 0),
+                LocalDateTime.of(2025, 7, 2, 0, 0),
+                StoreResponseDto.fromEntity(store)
         );
 
         when(couponManageService.createCoupon(any(CouponCreateRequestDto.class), any(Long.class))).thenReturn(responseDto);
 
         String json = objectMapper.writeValueAsString(requestDto);
 
-        mockMvc.perform(post("/api/v1/coupons")
+        mockMvc.perform(post(ApiMapping.COUPON_MANAGE_BASE + "/coupons")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk())
@@ -131,8 +160,9 @@ class CouponManageControllerTest {
                                 fieldWithPath("data.issuedCount").description("현재까지 발급된 수량"),
                                 fieldWithPath("data.couponValidStartTime").description("쿠폰 유효 시작일 (yyyy-MM-ddTHH:mm:ss)"),
                                 fieldWithPath("data.couponValidEndTime").description("쿠폰 유효 종료일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("data.storeName").description("쿠폰 제공 매장 이름")
-                        )
+                                fieldWithPath("data.couponIssueStartTime").description("쿠폰 유효 시작일 (yyyy-MM-ddTHH:mm:ss)"),
+                                fieldWithPath("data.couponIssueEndTime").description("쿠폰 유효 종료일 (yyyy-MM-ddTHH:mm:ss)")
+                        ).and(storeResponseFields("data.storeResponse."))
                 ));
     }
 }

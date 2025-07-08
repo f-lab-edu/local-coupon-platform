@@ -1,8 +1,12 @@
 package com.localcoupon.couponservice.coupon.service;
 
+import com.localcoupon.couponservice.common.external.kakao.dto.KakaoGeocodeInfoDto;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
+import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
+import com.localcoupon.couponservice.store.entity.Store;
+import com.localcoupon.couponservice.store.enums.StoreCategory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +16,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -115,6 +120,20 @@ class CouponRedissonServiceIntegrationTest {
         assertThrows(UserCouponException.class,
                 () -> couponRedissonServiceImpl.decreaseCouponStock(couponId));
     }
+    StoreRequestDto request = new StoreRequestDto(
+            "스타벅스",
+            "서울시 송파구 법원로 55",
+            StoreCategory.CAFE,
+            "02-1234-5678",
+            "매장 설명입니다.",
+            "http://example.com/image.jpg"
+    );
+
+    KakaoGeocodeInfoDto geoCodeInfo = new KakaoGeocodeInfoDto(
+            "110105",
+            new BigDecimal("37.4979"),
+            new BigDecimal("127.0276")
+    );
 
     private Coupon createCoupon() {
         return new Coupon(
@@ -126,7 +145,8 @@ class CouponRedissonServiceIntegrationTest {
                 LocalDateTime.now(),
                 LocalDateTime.now().plusDays(7),
                 LocalDateTime.now(),
-                LocalDateTime.now().plusDays(7)
+                LocalDateTime.now().plusDays(7),
+                (Store.from(request,geoCodeInfo, 1L))
         );
     }
 

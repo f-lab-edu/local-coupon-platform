@@ -36,7 +36,7 @@ public class StoreServiceImpl implements StoreService {
         // Kakao 좌표 변환 호출
         KakaoGeocodeInfoDto geoCodeInfo = kakaoGeocodeService.geocode(request.address());
 
-        Store store = Store.from(request, geoCodeInfo, ownerId, ""); //TODO : 이미지 처리 추가 필요
+        Store store = Store.from(request, geoCodeInfo, ownerId); //TODO : 이미지 처리 추가 필요
 
         //Store 저장
         Store saved = storeRepository.save(store);
