@@ -9,10 +9,10 @@ import com.localcoupon.couponservice.auth.dto.response.LogoutResponseDto;
 import com.localcoupon.couponservice.auth.enums.AuthErrorCode;
 import com.localcoupon.couponservice.auth.exception.PasswordNotMatchException;
 import com.localcoupon.couponservice.auth.service.AuthService;
-import com.localcoupon.couponservice.common.CommonErrorCode;
-import com.localcoupon.couponservice.common.exception.JsonSerializeException;
-import com.localcoupon.couponservice.common.util.PasswordEncoder;
+import com.localcoupon.couponservice.common.enums.CommonErrorCode;
+import com.localcoupon.couponservice.common.exception.CommonException;
 import com.localcoupon.couponservice.common.infra.RedisConstants;
+import com.localcoupon.couponservice.common.util.PasswordEncoder;
 import com.localcoupon.couponservice.common.util.TokenGenerator;
 import com.localcoupon.couponservice.user.entity.User;
 import com.localcoupon.couponservice.user.enums.UserErrorCode;
@@ -57,7 +57,7 @@ public class AuthServiceImpl implements AuthService {
                     RedisConstants.SESSION_TTL
             );
         } catch (JsonProcessingException e) {
-            throw new JsonSerializeException(CommonErrorCode.JSON_SERIALIZE_ERROR);
+            throw new CommonException(CommonErrorCode.JSON_SERIALIZE_ERROR);
         }
 
         return LoginResponseDto.of(sessionToken);

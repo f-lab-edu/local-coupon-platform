@@ -77,7 +77,6 @@ public class AuthFilter extends OncePerRequestFilter {
             log.error("[AuthFilter] Redis parse error", e);
             throw new InsufficientAuthenticationException("[AuthFilter] 세션 정보를 파싱할 수 없습니다.");
         }
-
         return createAuthenticationToken(sessionDto);
     }
 
