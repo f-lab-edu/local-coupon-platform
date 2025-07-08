@@ -2,11 +2,14 @@ package com.localcoupon.couponservice.coupon.entity;
 
 import com.localcoupon.couponservice.common.entity.BaseEntity;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
+import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.enums.CouponStock;
 import com.localcoupon.couponservice.store.entity.Store;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
@@ -66,9 +69,11 @@ public class Coupon extends BaseEntity {
             LocalDateTime couponValidStartTime,
             LocalDateTime couponValidEndTime,
             LocalDateTime couponIssueStartTime,
-            LocalDateTime couponIssueEndTime
+            LocalDateTime couponIssueEndTime,
+            Store store
     ) {
         super();
+        this.store = store;
         this.scope = scope;
         this.title = title;
         this.description = description;
@@ -80,8 +85,7 @@ public class Coupon extends BaseEntity {
         this.couponIssueEndTime = couponIssueEndTime;
     }
 
-
-    public static Coupon from(CouponCreateRequestDto request) {
+    public static Coupon from(CouponCreateRequestDto request, Store store) {
         return new Coupon(
                 request.scope(),
                 request.title(),
@@ -91,8 +95,20 @@ public class Coupon extends BaseEntity {
                 request.couponValidStartTime(),
                 request.couponValidEndTime(),
                 request.couponIssueStartTime(),
-                request.couponIssueEndTime()
+                request.couponIssueEndTime(),
+                store
         );
+    }
+
+    public void update(CouponUpdateRequestDto request) {
+        this.scope = request.scope();
+        this.title = request.title();
+        this.description = request.description();
+        this.totalCount = request.totalCount();
+        this.couponValidStartTime = request.couponValidStartTime();
+        this.couponValidEndTime = request.couponValidEndTime();
+        this.couponIssueStartTime = request.couponIssueStartTime();
+        this.couponIssueEndTime = request.couponIssueEndTime();
     }
 }
 

@@ -1,7 +1,7 @@
 package com.localcoupon.couponservice.store.service.impl;
 
-import com.localcoupon.couponservice.common.CommonErrorCode;
-import com.localcoupon.couponservice.common.exception.GeoException;
+import com.localcoupon.couponservice.common.enums.CommonErrorCode;
+import com.localcoupon.couponservice.common.exception.CommonException;
 import com.localcoupon.couponservice.common.external.kakao.KakaoGeocodeService;
 import com.localcoupon.couponservice.common.external.kakao.dto.KakaoGeocodeInfoDto;
 import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
@@ -61,7 +61,7 @@ public class StoreServiceImpl implements StoreService {
     public List<StoreResponseDto> getStoresNearby(UserStoreSearchRequestDto request) {
         if(request.minLatitude() == null || request.maxLatitude() == null ||
                 request.minLongitude() == null || request.maxLongitude() == null) {
-            throw new GeoException(CommonErrorCode.GEO_LOCATION_ERROR);
+            throw new CommonException(CommonErrorCode.GEO_LOCATION_ERROR);
         }
 
         List<Store> stores = storeRepository.findByLatLngRange(
