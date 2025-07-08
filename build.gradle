@@ -39,7 +39,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-aop'
 	compileOnly 'org.projectlombok:lombok'
 //	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.mysql:mysql-connector-j'
+	runtimeOnly 'com.mysql:mysql-connector-j:8.4.0'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -57,8 +57,11 @@ dependencies {
 	//Batch
 	implementation 'org.springframework.boot:spring-boot-starter-batch'
 	//QueryDSL
+	implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
+	// ✨ 추가!
+	annotationProcessor 'jakarta.persistence:jakarta.persistence-api:3.1.0'
 
 }
 
@@ -76,6 +79,14 @@ tasks.register('copyDocument', Copy) {
 	dependsOn asciidoctor
 	from asciidoctor.outputDir
 	into 'src/main/resources/static/docs'
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = ['src/main/java', 'build/generated']
+		}
+	}
 }
 
 
