@@ -12,18 +12,16 @@ public record LogContext(
         String uri,
         String method,
         String ip,
-        String action,
-        Throwable exception
+        String action
 ) {
 
-    public static LogContext of(HttpServletRequest request, String action, Throwable e) {
+    public static LogContext of(HttpServletRequest request, String action) {
         return new LogContext(
                 getUserEmailFromSecurityContext(),
                 request.getRequestURI(),
                 request.getMethod(),
                 extractClientIp(request),
-                action,
-                e
+                action
         );
     }
 
