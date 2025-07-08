@@ -65,8 +65,7 @@ class UserCouponControllerTest {
                 LocalDateTime.of(2025, 7, 1, 0, 0),
                 LocalDateTime.of(2025, 7, 12, 23, 59),
                 false,
-                "ABC123",
-                "qrTokenValue"
+                "ABC123"
         );
         when(userCouponService.getUserCoupons()).thenReturn(List.of(dto));
 
@@ -87,7 +86,6 @@ class UserCouponControllerTest {
                                 fieldWithPath("data[].couponValidStartTime").description("유효 시작일"),
                                 fieldWithPath("data[].couponValidEndTime").description("유효 종료일"),
                                 fieldWithPath("data[].isUsed").description("사용 여부"),
-                                fieldWithPath("data[].displayCode").description("화면 코드"),
                                 fieldWithPath("data[].qrToken").description("QR 토큰")
                         )
                 ));
@@ -104,8 +102,7 @@ class UserCouponControllerTest {
                 LocalDateTime.of(2025, 7, 1, 0, 0),
                 LocalDateTime.of(2025, 7, 12, 23, 59),
                 true,
-                "ABC123",
-                "qrTokenValue"
+                "ABC123"
         );
 
         when(userCouponService.useCoupon(1L)).thenReturn(dto);
@@ -130,7 +127,6 @@ class UserCouponControllerTest {
                                 fieldWithPath("data.couponValidStartTime").description("유효 시작일"),
                                 fieldWithPath("data.couponValidEndTime").description("유효 종료일"),
                                 fieldWithPath("data.isUsed").description("사용 여부"),
-                                fieldWithPath("data.displayCode").description("화면 코드"),
                                 fieldWithPath("data.qrToken").description("QR 토큰")
                         )
                 ));

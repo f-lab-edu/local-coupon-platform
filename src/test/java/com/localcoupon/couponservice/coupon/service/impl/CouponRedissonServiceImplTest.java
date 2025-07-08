@@ -1,5 +1,6 @@
 package com.localcoupon.couponservice.coupon.service.impl;
 
+import com.localcoupon.couponservice.common.external.kakao.dto.KakaoGeocodeInfoDto;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -135,6 +137,12 @@ class CouponRedissonServiceTest {
                 "매장 설명입니다.",
                 "http://example.com/image.jpg"
         );
+
+        KakaoGeocodeInfoDto geoCodeInfo = new KakaoGeocodeInfoDto(
+                "110105",
+                new BigDecimal("37.4979"),
+                new BigDecimal("127.0276")
+        );
         return new Coupon(
                 CouponScope.LOCAL,
                 "Test Coupon",
@@ -145,7 +153,7 @@ class CouponRedissonServiceTest {
                 LocalDateTime.now().plusDays(7),
                 LocalDateTime.now(),
                 LocalDateTime.now().plusDays(7),
-                Store.from(request,null, 1L,"dd")
+                Store.from(request,geoCodeInfo, 1L)
         );
     }
 }

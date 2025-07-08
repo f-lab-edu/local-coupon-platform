@@ -1,7 +1,7 @@
 package com.localcoupon.couponservice.store.service;
 
-import com.localcoupon.couponservice.common.CommonErrorCode;
-import com.localcoupon.couponservice.common.exception.GeoException;
+import com.localcoupon.couponservice.common.enums.CommonErrorCode;
+import com.localcoupon.couponservice.common.exception.CommonException;
 import com.localcoupon.couponservice.common.external.kakao.KakaoGeocodeService;
 import com.localcoupon.couponservice.common.external.kakao.dto.KakaoGeocodeInfoDto;
 import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
@@ -192,7 +192,7 @@ class StoreServiceTest {
 
         // when / then
         assertThatThrownBy(() -> storeService.getStoresNearby(request))
-                .isInstanceOf(GeoException.class)
+                .isInstanceOf(CommonException.class)
                 .hasMessageContaining(CommonErrorCode.GEO_LOCATION_ERROR.getMessage());
     }
 }

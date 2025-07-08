@@ -37,4 +37,11 @@ public record KakaoGeocodeInfoDto(
 
         return new KakaoGeocodeInfoDto(regionCode, latitude, longitude);
     }
+    public static KakaoGeocodeInfoDto of(
+            String regionCode,
+            BigDecimal latitude,
+            BigDecimal longitude
+    ) {
+       return new KakaoGeocodeInfoDto(regionCode, latitude, longitude);
+    }
 }
