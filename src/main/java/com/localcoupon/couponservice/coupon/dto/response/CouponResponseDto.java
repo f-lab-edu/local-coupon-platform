@@ -2,6 +2,7 @@ package com.localcoupon.couponservice.coupon.dto.response;
 
 import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
+import com.localcoupon.couponservice.store.dto.response.StoreResponseDto;
 
 import java.time.LocalDateTime;
 
@@ -14,7 +15,9 @@ public record CouponResponseDto(
         int issuedCount,
         LocalDateTime couponValidStartTime,
         LocalDateTime couponValidEndTime,
-        String storeName
+        LocalDateTime couponIssueStartTime,
+        LocalDateTime couponIssueEndTime,
+        StoreResponseDto storeResponse
 ) {
     public static CouponResponseDto from(Coupon coupon) {
         return new CouponResponseDto(
@@ -26,7 +29,9 @@ public record CouponResponseDto(
                 coupon.getIssuedCount(),
                 coupon.getCouponValidStartTime(),
                 coupon.getCouponValidEndTime(),
-                coupon.getStore() != null ? coupon.getStore().getName() : null
+                coupon.getCouponIssueStartTime(),
+                coupon.getCouponIssueEndTime(),
+                coupon.getStore() != null ? StoreResponseDto.fromEntity(coupon.getStore()) : null
         );
     }
 }
