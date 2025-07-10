@@ -10,10 +10,9 @@ import com.localcoupon.couponservice.store.dto.response.StoreResponseDto;
 import com.localcoupon.couponservice.store.entity.Store;
 import com.localcoupon.couponservice.store.repository.StoreRepository;
 import com.localcoupon.couponservice.store.service.StoreService;
-import com.localcoupon.couponservice.user.enums.UserErrorCode;
-import com.localcoupon.couponservice.user.exception.UserNotFoundException;
 import com.localcoupon.couponservice.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class StoreServiceImpl implements StoreService {
 
     private final StoreRepository storeRepository;
@@ -28,15 +28,13 @@ public class StoreServiceImpl implements StoreService {
     private final KakaoGeocodeService kakaoGeocodeService;
 
     @Override
-    public StoreResponseDto registerStore(StoreRequestDto request, String userEmail) {
-        //유저 정보 검증
-        Long ownerId = userRepository.findIdByEmail(userEmail)
-                .orElseThrow(() -> new UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
-
+    public StoreResponseDto registerStore(StoreRequestDto request, Long userId) {
         // Kakao 좌표 변환 호출
         KakaoGeocodeInfoDto geoCodeInfo = kakaoGeocodeService.geocode(request.address());
 
-        Store store = Store.from(request, geoCodeInfo, ownerId); //TODO : 이미지 처리 추가 필요
+        log.info(geoCodeInfo.toString());
+
+        Store store = Store.from(request, geoCodeInfo, userId); //TODO : 이미지 처리 추가 필요
 
         //Store 저장
         Store saved = storeRepository.save(store);
@@ -45,12 +43,8 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public List<StoreResponseDto> getMyStores(String userEmail) {
-        //유저 정보 검증
-        Long ownerId = userRepository.findIdByEmail(userEmail)
-                .orElseThrow(() -> new UserNotFoundException(UserErrorCode.USER_NOT_FOUND));
-
-        List<Store> stores = storeRepository.findByOwnerIdAndIsDeletedFalse(ownerId);
+    public List<StoreResponseDto> getMyStores(Long userId) {
+        List<Store> stores = storeRepository.findByOwnerIdAndIsDeletedFalse(userId);
 
         return stores.stream()
                 .map(StoreResponseDto::fromEntity)

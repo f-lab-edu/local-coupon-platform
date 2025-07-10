@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e) {
         return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
+                .status(HttpStatus.NO_CONTENT)
                 .body(ErrorResponse.of(CommonErrorCode.ENTITY_NOT_FOUND_ERROR));
     }
 

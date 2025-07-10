@@ -15,6 +15,8 @@ import com.localcoupon.couponservice.coupon.repository.CouponRepository;
 import com.localcoupon.couponservice.coupon.repository.IssuedCouponRepository;
 import com.localcoupon.couponservice.coupon.service.CouponManageService;
 import com.localcoupon.couponservice.store.entity.Store;
+import com.localcoupon.couponservice.store.enums.StoreErrorCode;
+import com.localcoupon.couponservice.store.exception.StoreException;
 import com.localcoupon.couponservice.store.repository.StoreRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +36,7 @@ public class CouponManageServiceImpl implements CouponManageService {
     @Transactional
     public CouponResponseDto createCoupon(CouponCreateRequestDto request, Long userId) {
         Store store = storeRepository.findByOwnerId(userId)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND_EXCEPTION));
 
         Coupon savedCoupon = couponRepository.save(Coupon.from(request, store));
 

@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface StoreService {
 
-    StoreResponseDto registerStore(StoreRequestDto request, String userEmail);
+    StoreResponseDto registerStore(StoreRequestDto request, Long userId);
 
-    List<StoreResponseDto> getMyStores(String userEmail);
+    List<StoreResponseDto> getMyStores(Long userId);
     List<StoreResponseDto> getStoresNearby(UserStoreSearchRequestDto request);
 
 }

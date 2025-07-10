@@ -11,8 +11,6 @@ import com.localcoupon.couponservice.store.entity.Store;
 import com.localcoupon.couponservice.store.enums.StoreCategory;
 import com.localcoupon.couponservice.store.repository.StoreRepository;
 import com.localcoupon.couponservice.store.service.impl.StoreServiceImpl;
-import com.localcoupon.couponservice.user.enums.UserErrorCode;
-import com.localcoupon.couponservice.user.exception.UserNotFoundException;
 import com.localcoupon.couponservice.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -83,7 +81,7 @@ class StoreServiceTest {
         given(storeRepository.save(any(Store.class))).willReturn(store);
 
         // when
-        StoreResponseDto result = storeService.registerStore(request, email);
+        StoreResponseDto result = storeService.registerStore(request, userId);
 
         // then
         assertThat(result).isNotNull();
@@ -92,29 +90,6 @@ class StoreServiceTest {
         assertThat(result.phoneNumber()).isEqualTo("02-1234-5678");
         assertThat(result.description()).isEqualTo("매장 설명입니다.");
         assertThat(result.imageUrl()).isEqualTo("http://example.com/image.jpg");
-    }
-
-    @Test
-    @DisplayName("registerStore - 유저가 존재하지 않으면 UserNotFoundException 발생")
-    void registerStore_userNotFound() {
-        // given
-        String email = "notfound@example.com";
-
-        StoreRequestDto request = new StoreRequestDto(
-                "스타벅스",
-                "서울시 송파구 법원로 55",
-                StoreCategory.CAFE,
-                "02-1234-5678",
-                "매장 설명입니다.",
-                "http://example.com/image.jpg"
-        );
-
-        given(userRepository.findIdByEmail(email)).willReturn(Optional.empty());
-
-        // when / then
-        assertThatThrownBy(() -> storeService.registerStore(request, email))
-                .isInstanceOf(UserNotFoundException.class)
-                .hasMessageContaining(UserErrorCode.USER_NOT_FOUND.getMessage());
     }
 
     @Test
@@ -141,7 +116,7 @@ class StoreServiceTest {
                 .willReturn(List.of(store));
 
         // when
-        List<StoreResponseDto> result = storeService.getMyStores(email);
+        List<StoreResponseDto> result = storeService.getMyStores(userId);
 
         // then
         assertThat(result).hasSize(1);

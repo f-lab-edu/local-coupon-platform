@@ -5,7 +5,7 @@ import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
-import com.localcoupon.couponservice.coupon.infra.redis.RedisCouponRepository;
+import com.localcoupon.couponservice.coupon.repository.CouponRedisRepository;
 import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
 import com.localcoupon.couponservice.store.entity.Store;
 import com.localcoupon.couponservice.store.enums.StoreCategory;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 class CouponRedissonServiceTest {
 
     @Mock
-    private RedisCouponRepository redisCouponRepository;
+    private CouponRedisRepository redisCouponRepository;
 
     @InjectMocks
     private CouponRedissonServiceImpl couponCacheService;
@@ -52,7 +52,7 @@ class CouponRedissonServiceTest {
         Coupon coupon = createCoupon();
         ReflectionTestUtils.setField(coupon, "id", couponId); //id db생성값
 
-        when(redisCouponRepository.getData(redisKey))
+        when(redisCouponRepository.getValue(redisKey))
                 .thenReturn(Optional.of(coupon.getTotalCount()));
 
         // when
@@ -63,7 +63,7 @@ class CouponRedissonServiceTest {
         assertThat(savedCoupon.getId()).isEqualTo(couponId);
         assertThat(savedCoupon.getTotalCount()).isEqualTo(coupon.getTotalCount());
 
-        Optional<Integer> savedStock = redisCouponRepository.getData(redisKey);
+        Optional<Integer> savedStock = redisCouponRepository.getValue(redisKey);
         assertThat(savedStock).isPresent();
         assertThat(savedStock.get()).isEqualTo(coupon.getTotalCount());
     }

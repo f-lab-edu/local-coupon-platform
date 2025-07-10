@@ -24,13 +24,13 @@ public class StoreController {
     @PostMapping
     public SuccessResponse<StoreResponseDto> registerStore( @AuthenticationPrincipal CustomUserDetails userDetails,
                                                            @RequestBody StoreRequestDto request) {
-        StoreResponseDto response = storeService.registerStore(request, userDetails.getEmail());
+        StoreResponseDto response = storeService.registerStore(request, userDetails.getId());
         return SuccessResponse.of(response);
     }
 
     @GetMapping("/my")
     public SuccessResponse<List<StoreResponseDto>> getMyStores( @AuthenticationPrincipal CustomUserDetails userDetails) {
-        List<StoreResponseDto> stores = storeService.getMyStores(userDetails.getEmail());
+        List<StoreResponseDto> stores = storeService.getMyStores(userDetails.getId());
         return SuccessResponse.of(stores);
     }
 
