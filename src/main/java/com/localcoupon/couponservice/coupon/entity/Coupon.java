@@ -42,7 +42,7 @@ public class Coupon extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "coupon_limit")
+    @Column(name = "coupon_total_count")
     private Integer totalCount;
 
     @Column(name = "coupon_issued_count")

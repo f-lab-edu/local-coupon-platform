@@ -1,4 +1,4 @@
-package com.localcoupon.couponservice.coupon.infra.redis;
+package com.localcoupon.couponservice.coupon.repository;
 
 import com.localcoupon.couponservice.common.util.CouponUtils;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
@@ -14,9 +14,11 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import static com.localcoupon.couponservice.common.infra.RedisConstants.COUPON_OPEN_PREFIX;
+
 @Repository
 @RequiredArgsConstructor
-public class RedisCouponRepository {
+public class CouponRedisRepository {
 
     private final RedissonClient redissonClient;
 
@@ -50,7 +52,7 @@ public class RedisCouponRepository {
         bucket.set(value, ttl);
     }
 
-    public <T> Optional<T> getData(String key) {
+    public <T> Optional<T> getValue(String key) {
         RBucket<T> bucket = redissonClient.getBucket(key);
         return Optional.ofNullable(bucket.get());
     }
@@ -59,6 +61,12 @@ public class RedisCouponRepository {
         RBucket<T> bucket = redissonClient.getBucket(key);
         bucket.delete();
     }
+
+    public Iterable<String> getAllOpenCouponKeys() {
+        String pattern = COUPON_OPEN_PREFIX + "*";
+        return redissonClient.getKeys().getKeysByPattern(pattern);
+    }
+
 
 
     public boolean exists(String key) {

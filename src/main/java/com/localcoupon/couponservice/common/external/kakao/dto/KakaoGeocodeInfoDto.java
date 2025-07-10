@@ -4,6 +4,7 @@ import com.localcoupon.couponservice.common.external.kakao.enums.KakaoErrorCode;
 import com.localcoupon.couponservice.common.external.kakao.exception.KakaoGeoCodeException;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Optional;
 
 public record KakaoGeocodeInfoDto(
@@ -28,11 +29,13 @@ public record KakaoGeocodeInfoDto(
         //Y 위도 확인
         BigDecimal latitude = Optional.ofNullable(geoCodeResponse.y())
                 .map(BigDecimal::new)
+                .map(lat -> lat.setScale(6, RoundingMode.HALF_UP))
                 .orElse(null);
 
         //X 경도 확인
         BigDecimal longitude = Optional.ofNullable(geoCodeResponse.x())
                 .map(BigDecimal::new)
+                .map(lon -> lon.setScale(6, RoundingMode.HALF_UP))
                 .orElse(null);
 
         return new KakaoGeocodeInfoDto(regionCode, latitude, longitude);
