@@ -27,7 +27,7 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 
     @Override
     public List<Coupon> findAllByOwnerIdWithCursorPaging(Long ownerId, CursorPageRequest request) {
-        //QueryDSL이 생성한 클래스들 정의
+//        //QueryDSL이 생성한 클래스들 인스턴스화
         QCoupon coupon = QCoupon.coupon;
         QStore store = QStore.store;
 

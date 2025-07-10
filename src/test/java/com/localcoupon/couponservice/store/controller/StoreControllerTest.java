@@ -146,7 +146,7 @@ class StoreControllerTest {
                 LocalDateTime.of(2025, 6, 1, 10, 0)
         );
 
-        when(storeService.getMyStores(eq("test@naver.com")))
+        when(storeService.getMyStores(eq(1L)))
                 .thenReturn(List.of(responseDto));
 
         mockMvc.perform(get("/api/v1/stores/my")

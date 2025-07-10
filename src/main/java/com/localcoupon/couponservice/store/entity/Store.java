@@ -59,18 +59,18 @@ public class Store extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column
-    @Size(max=255)
+    @NotNull
     private StoreCategory category;
 
     @Column
     private String regionCode;
 
-    @Column
-    @Digits(integer = 2, fraction = 6)
+    @Column(precision = 15, scale = 8)
+    @Digits(integer = 2, fraction = 8)
     private BigDecimal latitude;
 
-    @Column
-    @Digits(integer = 3, fraction = 6)
+    @Column(precision = 15, scale = 8)
+    @Digits(integer = 3, fraction = 8)
     private BigDecimal longitude;
 
     @Column

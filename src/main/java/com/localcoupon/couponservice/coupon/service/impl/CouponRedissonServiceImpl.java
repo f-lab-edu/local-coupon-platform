@@ -3,7 +3,7 @@ package com.localcoupon.couponservice.coupon.service.impl;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
-import com.localcoupon.couponservice.coupon.infra.redis.RedisCouponRepository;
+import com.localcoupon.couponservice.coupon.repository.CouponRedisRepository;
 import com.localcoupon.couponservice.coupon.service.CouponCacheService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import static com.localcoupon.couponservice.common.infra.RedisConstants.COUPON_O
 @RequiredArgsConstructor
 public class CouponRedissonServiceImpl implements CouponCacheService {
 
-    private final RedisCouponRepository redisCouponRepository;
+    private final CouponRedisRepository couponRedisRepository;
 
     @Override
     public Coupon saveCouponForOpen(Coupon coupon) {
@@ -29,7 +29,7 @@ public class CouponRedissonServiceImpl implements CouponCacheService {
                 coupon.getCouponValidEndTime().plusDays(1)
         ).getSeconds();
 
-        redisCouponRepository.saveData(
+        couponRedisRepository.saveData(
                 key,
                 coupon.getTotalCount(),
                 Duration.ofSeconds(ttlSeconds)
@@ -40,7 +40,7 @@ public class CouponRedissonServiceImpl implements CouponCacheService {
     @Override
     public boolean isCouponOpen(Long couponId) {
         String key = COUPON_OPEN_PREFIX + couponId;
-        return redisCouponRepository.exists(key);
+        return couponRedisRepository.exists(key);
     }
 
     @Override
@@ -48,11 +48,11 @@ public class CouponRedissonServiceImpl implements CouponCacheService {
         String lockKey = COUPON_LOCK_PREFIX + couponId;
         String dataKey = COUPON_OPEN_PREFIX + couponId;
 
-        return redisCouponRepository.executeWithLock(
+        return couponRedisRepository.executeWithLock(
                 lockKey,
                 3,
                 3,
-                () -> redisCouponRepository.decreaseCouponStock(dataKey)
+                () -> couponRedisRepository.decreaseCouponStock(dataKey)
                         .orElseThrow(() -> new UserCouponException(UserCouponErrorCode.SOLD_OUT_COUPON))
         );
     }
