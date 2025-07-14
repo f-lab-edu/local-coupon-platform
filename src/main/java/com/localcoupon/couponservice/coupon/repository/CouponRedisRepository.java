@@ -31,7 +31,7 @@ public class CouponRedisRepository {
         RLock lock = redissonClient.getLock(lockKey);
 
         try {
-            boolean locked = lock.tryLock(waitSeconds, ttl, TimeUnit.SECONDS);
+            boolean locked = lock.tryLock(waitSeconds, ttl, TimeUnit.MILLISECONDS);
             if (!locked) {
                 throw new UserCouponException(UserCouponErrorCode.COUPON_LOCK_FAILED);
             }
@@ -74,14 +74,15 @@ public class CouponRedisRepository {
     }
 
     public Optional<Integer> decreaseCouponStock(String key) {
-        RBucket<Integer> bucket = redissonClient.getBucket(key);
+        RBucket<String> bucket = redissonClient.getBucket(key);
 
-        return Optional.ofNullable(bucket.get())
+        return Optional.of(bucket.get())
+                .map(Integer::parseInt)
                 .filter(CouponUtils::isStockCountPositive)
                 .map(stock -> {
-                    int updatedValue = stock - 1;
-                    bucket.set(updatedValue);
-                    return updatedValue;
+                    bucket.set(String.valueOf(stock -1));
+                    return stock-1;
                 });
+
     }
 }

@@ -27,6 +27,7 @@ public class CouponOpenBatch {
 
     @Scheduled(cron = "0 */5 * * * *") // 5분마다 실행
     public void openCoupons() {
+        log.info("[Coupon-Open-Batch] 쿠폰 오픈 배치 시작");
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime tenMinLater = now.plusMinutes(10);
 
@@ -56,7 +57,7 @@ public class CouponOpenBatch {
             return;
         }
 
-        couponRedisRepository.saveData(issuedCountKey,coupon.couponLimit(), getTtlSeconds(coupon.couponIssueEndTime()));
+        couponRedisRepository.saveData(issuedCountKey,String.valueOf(coupon.couponLimit()), getTtlSeconds(coupon.couponIssueEndTime()));
 
         log.info("[Coupon-Open-Batch] couponId={} 등록 완료. totalCount={}", coupon.id(), coupon.couponLimit());
     }

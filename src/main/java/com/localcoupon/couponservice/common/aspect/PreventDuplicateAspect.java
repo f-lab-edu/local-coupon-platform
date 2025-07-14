@@ -31,13 +31,13 @@ public class PreventDuplicateAspect {
         String key = generateKey();
 
         if (couponRedisRepository.exists(key)) {
+            log.error("[PrventDuplicateAspect] Duplicate request detected: {}", key);
             throw new CommonException(CommonErrorCode.DUPLICATE_ERROR);
         }
 
         // Redis에 key 기록, TTL 설정
         couponRedisRepository.saveData(key,DUPLICATE_REQUEST_LOCK,
                 Duration.ofSeconds(preventDuplicateRequest.expireSeconds()));
-
 
         Object result = joinPoint.proceed(); //실제 메소드 수행
         couponRedisRepository.deleteData(key); // 레디스 키 삭제
