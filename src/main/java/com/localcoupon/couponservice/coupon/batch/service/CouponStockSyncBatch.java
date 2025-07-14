@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,6 +16,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Transactional
 public class CouponStockSyncBatch {
     private final JdbcTemplate jdbcTemplate;
     private final CouponRedisRepository couponRedisRepository;
@@ -28,22 +30,23 @@ public class CouponStockSyncBatch {
     private void syncSingleCoupon(String redisKey) {
         // key → couponId 추출
         Long couponId = extractCouponId(redisKey);
-        // Optional<Long>로 타입 맞춰주기
-        Optional<Long> issuedCountNullable = couponRedisRepository.getValue(redisKey);
+        // Optional<String>로 타입 맞춰주기
+        Optional<String> issuedCountNullable = couponRedisRepository.getValue(redisKey);
 
         issuedCountNullable.ifPresentOrElse(issuedCount -> {
-                    int updatedRows = jdbcTemplate.update(
-                            """
-                            UPDATE coupon
-                               SET coupon_issued_count = ?
-                             WHERE id = ?
-                            """,
-                            issuedCount,
-                            couponId
-                    );
+                    String sql = String.format("""
+                                    UPDATE coupon
+                                       SET coupon_issued_count = coupon_total_count - %d
+                                     WHERE id = ?
+                                    """, Integer.parseInt(issuedCount));
+
+                    int updatedRows = jdbcTemplate.update(sql, couponId);
+
+
                     log.info("[Coupon-Sync-Batch] couponId={} , issuedCount={} → DB 업데이트 ({} rows)",
                             couponId, issuedCount, updatedRows);
                     },
+
                 () ->  log.info("[Coupon-Sync-Batch] No coupon found for couponId={}", couponId)
         );
     }

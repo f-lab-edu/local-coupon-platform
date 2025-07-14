@@ -6,6 +6,7 @@ import com.localcoupon.couponservice.coupon.exception.UserCouponException;
 import com.localcoupon.couponservice.coupon.repository.CouponRedisRepository;
 import com.localcoupon.couponservice.coupon.service.CouponCacheService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -16,6 +17,7 @@ import static com.localcoupon.couponservice.common.infra.RedisConstants.COUPON_O
 
 @Service
 @RequiredArgsConstructor
+@Primary
 public class CouponRedissonServiceImpl implements CouponCacheService {
 
     private final CouponRedisRepository couponRedisRepository;
@@ -50,8 +52,8 @@ public class CouponRedissonServiceImpl implements CouponCacheService {
 
         return couponRedisRepository.executeWithLock(
                 lockKey,
-                3,
-                3,
+                2000,
+                5000,
                 () -> couponRedisRepository.decreaseCouponStock(dataKey)
                         .orElseThrow(() -> new UserCouponException(UserCouponErrorCode.SOLD_OUT_COUPON))
         );
