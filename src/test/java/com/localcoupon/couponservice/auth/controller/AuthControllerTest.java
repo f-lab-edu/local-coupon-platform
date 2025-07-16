@@ -4,23 +4,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.localcoupon.couponservice.auth.dto.request.LoginRequestDto;
 import com.localcoupon.couponservice.auth.dto.response.LoginResponseDto;
 import com.localcoupon.couponservice.auth.dto.response.LogoutResponseDto;
-import com.localcoupon.couponservice.auth.filter.AuthFilter;
 import com.localcoupon.couponservice.auth.service.AuthService;
+import com.localcoupon.couponservice.common.exception.GlobalExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -31,22 +28,22 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(RestDocumentationExtension.class)
-@WebMvcTest(controllers = AuthController.class,
-        excludeFilters = {
-                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = AuthFilter.class)
-        })
+//@WebMvcTest(controllers = AuthController.class) 스프링 컨트롤러 빈을 컨텍스트에 등록 의존성 자동 주입
 class AuthControllerTest {
-
-    @MockBean
+    @Mock
     private AuthService authService;
-
+    //Mockmvc 정의
     private MockMvc mockMvc;
 
+    //실제 객체 사용
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
+    void setUp(RestDocumentationContextProvider provider) {
+        MockitoAnnotations.openMocks(this);
+        AuthController authcontroller = new AuthController(authService);
+        this.mockMvc = MockMvcBuilders.standaloneSetup(authcontroller)
+                .setControllerAdvice(new GlobalExceptionHandler())
                 .apply(org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration(provider))
                 .build();
     }
@@ -54,9 +51,11 @@ class AuthControllerTest {
     @Test
     @DisplayName("로그인 API")
     void login() throws Exception {
+        //given
         LoginRequestDto requestDto = new LoginRequestDto("test@example.com", "password123");
-        LoginResponseDto responseDto = new LoginResponseDto("abcd-1234-token");
 
+        //응답 객체
+        LoginResponseDto responseDto = new LoginResponseDto("abcd-1234-token");
         when(authService.login(any(LoginRequestDto.class))).thenReturn(responseDto);
 
         mockMvc.perform(post("/api/v1/auth/login")
