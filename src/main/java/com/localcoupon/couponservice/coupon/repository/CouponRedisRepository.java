@@ -1,11 +1,14 @@
 package com.localcoupon.couponservice.coupon.repository;
 
+import com.localcoupon.couponservice.common.enums.CommonErrorCode;
 import com.localcoupon.couponservice.common.enums.Result;
+import com.localcoupon.couponservice.common.exception.CommonException;
 import com.localcoupon.couponservice.common.infra.RedisProperties;
 import com.localcoupon.couponservice.common.util.CouponUtils;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -18,6 +21,7 @@ import java.util.function.Supplier;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class CouponRedisRepository {
 
     private final RedissonClient redissonClient;
@@ -49,42 +53,76 @@ public class CouponRedisRepository {
     }
 
     public <T> Result saveData(String key, T value, Duration ttl) {
-        RBucket<T> bucket = redissonClient.getBucket(key);
-        bucket.set(value, ttl);
-        return Result.SUCCESS;
+        try {
+            RBucket<T> bucket = redissonClient.getBucket(key);
+            bucket.set(value, ttl);
+            return Result.SUCCESS;
+        } catch (Exception e) {
+            log.error("[Redis] Failed to save key: {}, value: {}", key, value, e);
+            throw new CommonException(CommonErrorCode.REDIS_OPERATION_ERROR);
+        }
     }
+
 
     public <T> Optional<T> getValue(String key, Class<T> clazz) {
-        RBucket<T> bucket = redissonClient.getBucket(key);
-        return Optional.ofNullable(clazz.cast(bucket.get()));
+        try {
+            RBucket<T> bucket = redissonClient.getBucket(key);
+            return Optional.ofNullable(clazz.cast(bucket.get()));
+        } catch (Exception e) {
+            log.error("[Redis] Failed to get value for key: {}", key, e);
+            throw new CommonException(CommonErrorCode.REDIS_OPERATION_ERROR);
+        }
     }
+
 
     public <T> boolean deleteData(String key) {
-        RBucket<T> bucket = redissonClient.getBucket(key);
-        return bucket.delete();
+        try {
+            RBucket<T> bucket = redissonClient.getBucket(key);
+            return bucket.delete();
+        } catch (Exception e) {
+            log.error("[Redis] Failed to delete key: {}", key, e);
+            throw new CommonException(CommonErrorCode.REDIS_OPERATION_ERROR);
+        }
     }
 
+
     public Iterable<String> getAllOpenCouponKeys() {
-        String pattern = redisProperties.couponOpenPrefix() + "*";
-        return redissonClient.getKeys().getKeysByPattern(pattern);
+        try {
+            String pattern = redisProperties.couponOpenPrefix() + "*";
+            return redissonClient.getKeys().getKeysByPattern(pattern);
+        } catch (Exception e) {
+            log.error("[Redis] Failed to get keys by pattern", e);
+            throw new CommonException(CommonErrorCode.REDIS_OPERATION_ERROR);
+        }
     }
 
 
 
     public boolean exists(String key) {
-        return redissonClient.getBucket(key).isExists();
+        try {
+            return redissonClient.getBucket(key).isExists();
+        } catch (Exception e) {
+            log.error("[Redis] exists() failed for key={}", key, e);
+            throw new CommonException(CommonErrorCode.REDIS_OPERATION_ERROR);
+        }
     }
+
 
     public Optional<Integer> decreaseCouponStock(String key) {
-        RBucket<String> bucket = redissonClient.getBucket(key);
+        try {
+            RBucket<String> bucket = redissonClient.getBucket(key);
 
-        return Optional.of(bucket.get())
-                .map(Integer::parseInt)
-                .filter(CouponUtils::isStockCountPositive)
-                .map(stock -> {
-                    bucket.set(String.valueOf(stock -1));
-                    return stock-1;
-                });
-
+            return Optional.ofNullable(bucket.get())
+                    .map(Integer::parseInt)
+                    .filter(CouponUtils::isStockCountPositive)
+                    .map(stock -> {
+                        bucket.set(String.valueOf(stock - 1));
+                        return stock - 1;
+                    });
+        } catch (Exception e) {
+            log.error("[Redis] decreaseCouponStock failed. key={}", key, e);
+            throw new CommonException(CommonErrorCode.REDIS_OPERATION_ERROR);
+        }
     }
+
 }

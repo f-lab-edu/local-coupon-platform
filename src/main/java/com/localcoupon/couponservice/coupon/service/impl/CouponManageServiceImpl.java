@@ -1,7 +1,7 @@
 package com.localcoupon.couponservice.coupon.service.impl;
 
 import com.localcoupon.couponservice.common.dto.request.CursorPageRequest;
-import com.localcoupon.couponservice.common.dto.response.ResultCodeResponseDto;
+import com.localcoupon.couponservice.common.dto.response.ResultResponseDto;
 import com.localcoupon.couponservice.common.enums.Result;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
@@ -9,6 +9,8 @@ import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponVerifyResponseDto;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.entity.IssuedCoupon;
+import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
+import com.localcoupon.couponservice.coupon.exception.UserCouponException;
 import com.localcoupon.couponservice.coupon.repository.CouponRepository;
 import com.localcoupon.couponservice.coupon.repository.IssuedCouponRepository;
 import com.localcoupon.couponservice.coupon.service.CouponManageService;
@@ -16,7 +18,6 @@ import com.localcoupon.couponservice.store.entity.Store;
 import com.localcoupon.couponservice.store.enums.StoreErrorCode;
 import com.localcoupon.couponservice.store.exception.StoreException;
 import com.localcoupon.couponservice.store.repository.StoreRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +56,7 @@ public class CouponManageServiceImpl implements CouponManageService {
     @Transactional(readOnly = true)
     public CouponResponseDto getCouponDetail(Long couponId) {
         Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new UserCouponException(UserCouponErrorCode.COUPON_NOT_FOUND));
 
         return CouponResponseDto.from(coupon);
     }
@@ -64,7 +65,7 @@ public class CouponManageServiceImpl implements CouponManageService {
     @Transactional
     public CouponResponseDto updateCoupon(Long couponId, Long userId, CouponUpdateRequestDto request) {
         Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new UserCouponException(UserCouponErrorCode.COUPON_NOT_FOUND));
 
         coupon.update(request);
 
@@ -73,11 +74,11 @@ public class CouponManageServiceImpl implements CouponManageService {
 
     @Override
     @Transactional
-    public ResultCodeResponseDto deleteCoupon(Long couponId, Long userId) {
+    public ResultResponseDto deleteCoupon(Long couponId, Long userId) {
         Coupon coupon = couponRepository.findById(couponId)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new UserCouponException(UserCouponErrorCode.COUPON_NOT_FOUND));
         coupon.delete();
-        return ResultCodeResponseDto.from(Result.SUCCESS);
+        return ResultResponseDto.from(Result.SUCCESS);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class CouponManageServiceImpl implements CouponManageService {
     public CouponVerifyResponseDto verifyCoupon(String qrToken) {
         // 유저의 발급 내역 조회
         IssuedCoupon issuedCoupon = issuedCouponRepository.findByQrToken(qrToken)
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(() -> new UserCouponException(UserCouponErrorCode.COUPON_NOT_FOUND));
 
         //쿠폰 사용처리
         IssuedCoupon usedCoupon = issuedCoupon.use();

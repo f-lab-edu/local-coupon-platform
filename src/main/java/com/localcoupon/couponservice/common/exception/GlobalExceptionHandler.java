@@ -35,13 +35,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e) {
         return ResponseEntity
-                .status(HttpStatus.NO_CONTENT)
+                .status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(CommonErrorCode.ENTITY_NOT_FOUND_ERROR));
     }
 
     // 커스텀 예외(BaseException) 처리
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<ErrorResponse> handleBaseException(BaseException e) {
+        log.error("[BUSINESS_ERROR] {}", e.getMessage(), e);
         return ResponseEntity
                 .status(e.getHttpStatus())
                 .body(ErrorResponse.of(e.getErrorCode()));
