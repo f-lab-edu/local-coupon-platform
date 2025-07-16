@@ -84,6 +84,8 @@ public class Store extends BaseEntity {
     @Size(max=500)
     private String imageUrl;
 
+    //연관관계의 주인이 아닌쪽에서 선언 (상대가 외래키를 관리한다 즉 쿠폰이 관리의 주체)
+    //많은 쪽이 외래키를 관리하고 있어야 접근이 쉽고 변경이 용이
     @OneToMany(mappedBy = "store")
     private List<Coupon> coupons;
 

@@ -4,7 +4,7 @@ import com.localcoupon.couponservice.common.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 public enum StoreErrorCode implements ErrorCode {
-    STORE_NOT_FOUND_EXCEPTION("스토어 엔티티를 찾을 수 없습니다.", HttpStatus.NO_CONTENT);
+    STORE_NOT_FOUND_EXCEPTION("스토어 엔티티를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
 
     private final String message;
     private final HttpStatus status;
