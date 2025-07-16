@@ -31,7 +31,7 @@ public record CouponResponseDto(
                 coupon.getCouponValidEndTime(),
                 coupon.getCouponIssueStartTime(),
                 coupon.getCouponIssueEndTime(),
-                coupon.getStore() != null ? StoreResponseDto.fromEntity(coupon.getStore()) : null
+                StoreResponseDto.fromEntity(coupon.getStore())
         );
     }
 }

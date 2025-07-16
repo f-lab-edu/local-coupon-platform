@@ -1,6 +1,7 @@
 package com.localcoupon.couponservice.coupon.service;
 
 import com.localcoupon.couponservice.common.external.kakao.dto.KakaoGeocodeInfoDto;
+import com.localcoupon.couponservice.common.infra.RedisProperties;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
@@ -22,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-import static com.localcoupon.couponservice.common.infra.RedisConstants.COUPON_OPEN_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -37,7 +37,10 @@ class CouponRedissonServiceIntegrationTest {
     private RedissonClient redissonClient;
 
     private final Long couponId = 1L;
-    private final String redisKey = COUPON_OPEN_PREFIX + couponId;
+
+    @Autowired
+    private RedisProperties redisProperties;
+    private final String redisKey = redisProperties.couponOpenPrefix() + couponId;
 
     @AfterEach
     void tearDown() {

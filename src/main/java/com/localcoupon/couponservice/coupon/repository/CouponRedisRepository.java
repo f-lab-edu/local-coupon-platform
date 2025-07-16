@@ -1,5 +1,7 @@
 package com.localcoupon.couponservice.coupon.repository;
 
+import com.localcoupon.couponservice.common.enums.Result;
+import com.localcoupon.couponservice.common.infra.RedisProperties;
 import com.localcoupon.couponservice.common.util.CouponUtils;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
@@ -14,13 +16,12 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import static com.localcoupon.couponservice.common.infra.RedisConstants.COUPON_OPEN_PREFIX;
-
 @Repository
 @RequiredArgsConstructor
 public class CouponRedisRepository {
 
     private final RedissonClient redissonClient;
+    private final RedisProperties redisProperties;
 
     public <T> T executeWithLock(
             String lockKey,
@@ -47,23 +48,24 @@ public class CouponRedisRepository {
         }
     }
 
-    public <T> void saveData(String key, T value, Duration ttl) {
+    public <T> Result saveData(String key, T value, Duration ttl) {
         RBucket<T> bucket = redissonClient.getBucket(key);
         bucket.set(value, ttl);
+        return Result.SUCCESS;
     }
 
-    public <T> Optional<T> getValue(String key) {
+    public <T> Optional<T> getValue(String key, Class<T> clazz) {
         RBucket<T> bucket = redissonClient.getBucket(key);
-        return Optional.ofNullable(bucket.get());
+        return Optional.ofNullable(clazz.cast(bucket.get()));
     }
 
-    public <T> void deleteData(String key) {
+    public <T> boolean deleteData(String key) {
         RBucket<T> bucket = redissonClient.getBucket(key);
-        bucket.delete();
+        return bucket.delete();
     }
 
     public Iterable<String> getAllOpenCouponKeys() {
-        String pattern = COUPON_OPEN_PREFIX + "*";
+        String pattern = redisProperties.couponOpenPrefix() + "*";
         return redissonClient.getKeys().getKeysByPattern(pattern);
     }
 

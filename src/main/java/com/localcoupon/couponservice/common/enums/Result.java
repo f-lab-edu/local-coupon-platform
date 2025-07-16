@@ -1,11 +1,11 @@
 package com.localcoupon.couponservice.common.enums;
 
-public enum ResultCode {
+public enum Result {
     SUCCESS(1),
     FAIL(0);
     private int code;
 
-    ResultCode(int value) {
+    Result(int value) {
         this.code = value;
     }
 

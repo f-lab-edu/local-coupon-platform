@@ -41,11 +41,12 @@ public class IssuedCoupon {
     @Column(name = "is_used")
     private boolean isUsed;
 
-    public void use() {
+    public IssuedCoupon use() {
         if (this.isUsed) {
             throw new UserCouponException(UserCouponErrorCode.ALREADY_COUPON_USED);
         }
         this.isUsed = true;
         this.usedAt = LocalDateTime.now();
+        return this;
     }
 }

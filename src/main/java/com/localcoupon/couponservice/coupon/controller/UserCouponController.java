@@ -3,7 +3,7 @@ package com.localcoupon.couponservice.coupon.controller;
 import com.localcoupon.couponservice.common.annotation.PreventDuplicateRequest;
 import com.localcoupon.couponservice.common.constants.ApiMapping;
 import com.localcoupon.couponservice.common.dto.response.SuccessResponse;
-import com.localcoupon.couponservice.common.enums.ResultCode;
+import com.localcoupon.couponservice.common.enums.Result;
 import com.localcoupon.couponservice.coupon.dto.response.UserIssuedCouponResponseDto;
 import com.localcoupon.couponservice.coupon.service.UserCouponService;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +19,9 @@ public class UserCouponController {
 
     @PreventDuplicateRequest
     @PostMapping("/{couponId}/issue")
-    public SuccessResponse<ResultCode> issueCoupon(@PathVariable("couponId") Long couponId) {
-        ResultCode resultCode = userCouponService.issueCoupon(couponId);
-        return SuccessResponse.of(resultCode);
+    public SuccessResponse<Result> issueCoupon(@PathVariable("couponId") Long couponId) {
+        Result result = userCouponService.issueCoupon(couponId);
+        return SuccessResponse.of(result);
     }
 
     @GetMapping
