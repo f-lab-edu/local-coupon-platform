@@ -1,5 +1,6 @@
 package com.localcoupon.couponservice.coupon.batch.service;
 
+import com.localcoupon.couponservice.common.infra.RedisProperties;
 import com.localcoupon.couponservice.coupon.batch.dto.CouponOpenDto;
 import com.localcoupon.couponservice.coupon.repository.CouponRedisRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +16,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.localcoupon.couponservice.common.infra.RedisConstants.COUPON_OPEN_PREFIX;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -24,6 +23,7 @@ public class CouponOpenBatch {
 
     private final CouponRedisRepository couponRedisRepository;
     private final JdbcTemplate jdbcTemplate;
+    private final RedisProperties redisProperties;
 
     @Scheduled(cron = "0 */5 * * * *") // 5분마다 실행
     public void openCoupons() {
@@ -50,7 +50,7 @@ public class CouponOpenBatch {
     }
 
     private void openSingleCoupon(CouponOpenDto coupon) {
-        String issuedCountKey = COUPON_OPEN_PREFIX + coupon.id();
+        String issuedCountKey = redisProperties.couponOpenPrefix() + coupon.id();
 
         if (couponRedisRepository.exists(issuedCountKey)) {
             log.info("[Coupon-Open-Batch] couponId={} already opened in Redis.", coupon.id());

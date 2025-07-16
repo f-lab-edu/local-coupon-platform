@@ -1,6 +1,7 @@
 package com.localcoupon.couponservice.coupon.entity;
 
 import com.localcoupon.couponservice.common.entity.BaseEntity;
+import com.localcoupon.couponservice.common.enums.Result;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
@@ -100,7 +101,7 @@ public class Coupon extends BaseEntity {
         );
     }
 
-    public void update(CouponUpdateRequestDto request) {
+    public Result update(CouponUpdateRequestDto request) {
         this.scope = request.scope();
         this.title = request.title();
         this.description = request.description();
@@ -109,6 +110,7 @@ public class Coupon extends BaseEntity {
         this.couponValidEndTime = request.couponValidEndTime();
         this.couponIssueStartTime = request.couponIssueStartTime();
         this.couponIssueEndTime = request.couponIssueEndTime();
+        return Result.SUCCESS;
     }
 }
 

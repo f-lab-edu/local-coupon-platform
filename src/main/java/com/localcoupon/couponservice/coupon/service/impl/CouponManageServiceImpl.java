@@ -2,15 +2,13 @@ package com.localcoupon.couponservice.coupon.service.impl;
 
 import com.localcoupon.couponservice.common.dto.request.CursorPageRequest;
 import com.localcoupon.couponservice.common.dto.response.ResultCodeResponseDto;
-import com.localcoupon.couponservice.common.enums.ResultCode;
+import com.localcoupon.couponservice.common.enums.Result;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponVerifyResponseDto;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.entity.IssuedCoupon;
-import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
-import com.localcoupon.couponservice.coupon.exception.UserCouponException;
 import com.localcoupon.couponservice.coupon.repository.CouponRepository;
 import com.localcoupon.couponservice.coupon.repository.IssuedCouponRepository;
 import com.localcoupon.couponservice.coupon.service.CouponManageService;
@@ -79,7 +77,7 @@ public class CouponManageServiceImpl implements CouponManageService {
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(EntityNotFoundException::new);
         coupon.delete();
-        return ResultCodeResponseDto.from(ResultCode.SUCCESS);
+        return ResultCodeResponseDto.from(Result.SUCCESS);
     }
 
     @Override
@@ -89,16 +87,11 @@ public class CouponManageServiceImpl implements CouponManageService {
         IssuedCoupon issuedCoupon = issuedCouponRepository.findByQrToken(qrToken)
                 .orElseThrow(EntityNotFoundException::new);
 
-        // 이미 사용됐으면 예외처리
-        if (issuedCoupon.isUsed()) {
-            throw new UserCouponException(UserCouponErrorCode.ALREADY_COUPON_USED);
-        }
-
-        // 사용 처리
-        issuedCoupon.use();
+        //쿠폰 사용처리
+        IssuedCoupon usedCoupon = issuedCoupon.use();
 
         return CouponVerifyResponseDto.of(
-                issuedCoupon.getCoupon().getId(),
+                usedCoupon.getCoupon().getId(),
                 true
         );
     }

@@ -1,5 +1,6 @@
 package com.localcoupon.couponservice.coupon.service.impl;
 
+import com.localcoupon.couponservice.common.infra.RedisProperties;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
@@ -12,8 +13,6 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import static com.localcoupon.couponservice.common.infra.RedisConstants.COUPON_LOCK_PREFIX;
-import static com.localcoupon.couponservice.common.infra.RedisConstants.COUPON_OPEN_PREFIX;
 
 @Service
 @RequiredArgsConstructor
@@ -21,10 +20,11 @@ import static com.localcoupon.couponservice.common.infra.RedisConstants.COUPON_O
 public class CouponRedissonServiceImpl implements CouponCacheService {
 
     private final CouponRedisRepository couponRedisRepository;
+    private final RedisProperties redisProperties;
 
     @Override
     public Coupon saveCouponForOpen(Coupon coupon) {
-        String key = COUPON_OPEN_PREFIX + coupon.getId();
+        String key = redisProperties.couponOpenPrefix() + coupon.getId();
 
         long ttlSeconds = Duration.between(
                 LocalDateTime.now(),
@@ -41,14 +41,14 @@ public class CouponRedissonServiceImpl implements CouponCacheService {
 
     @Override
     public boolean isCouponOpen(Long couponId) {
-        String key = COUPON_OPEN_PREFIX + couponId;
+        String key = redisProperties.couponOpenPrefix() + couponId;
         return couponRedisRepository.exists(key);
     }
 
     @Override
     public int decreaseCouponStock(Long couponId) {
-        String lockKey = COUPON_LOCK_PREFIX + couponId;
-        String dataKey = COUPON_OPEN_PREFIX + couponId;
+        String lockKey = redisProperties.couponLockPrefix() + couponId;
+        String dataKey = redisProperties.couponOpenPrefix() + couponId;
 
         return couponRedisRepository.executeWithLock(
                 lockKey,

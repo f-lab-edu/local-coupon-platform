@@ -1,6 +1,6 @@
 package com.localcoupon.couponservice.coupon.service.impl;
 
-import com.localcoupon.couponservice.common.enums.ResultCode;
+import com.localcoupon.couponservice.common.enums.Result;
 import com.localcoupon.couponservice.coupon.dto.response.UserIssuedCouponResponseDto;
 import com.localcoupon.couponservice.coupon.service.CouponCacheService;
 import com.localcoupon.couponservice.coupon.service.UserCouponService;
@@ -21,10 +21,10 @@ public class UserCouponServiceImpl implements UserCouponService {
 
 
     @Override
-    public ResultCode issueCoupon(Long couponId) {
+    public Result issueCoupon(Long couponId) {
         if(couponCacheService.isCouponOpen(couponId)) {
             couponCacheService.decreaseCouponStock(couponId);
         }
-        return ResultCode.SUCCESS;
+        return Result.SUCCESS;
     }
 }

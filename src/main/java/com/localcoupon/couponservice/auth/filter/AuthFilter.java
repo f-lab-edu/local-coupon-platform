@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.localcoupon.couponservice.auth.dto.UserSessionDto;
 import com.localcoupon.couponservice.auth.security.CustomUserDetails;
 import com.localcoupon.couponservice.common.config.SecurityConfig;
-import com.localcoupon.couponservice.common.infra.RedisConstants;
+import com.localcoupon.couponservice.common.infra.RedisProperties;
 import com.localcoupon.couponservice.common.util.StringUtils;
 import com.localcoupon.couponservice.user.enums.UserErrorCode;
 import jakarta.servlet.FilterChain;
@@ -31,6 +31,7 @@ public class AuthFilter extends OncePerRequestFilter {
 
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
+    private final RedisProperties redisProperties;
 
     private static final String AUTH_HEADER = "Authorization";
     private static final String BEARER = "Bearer ";
@@ -65,7 +66,7 @@ public class AuthFilter extends OncePerRequestFilter {
 
 
     private UsernamePasswordAuthenticationToken validateSession(String sessionId) {
-        String json = redisTemplate.opsForValue().get(RedisConstants.SESSION_PREFIX + sessionId);
+        String json = redisTemplate.opsForValue().get(redisProperties.sessionPrefix() + sessionId);
         if (StringUtils.isEmpty(json)) {
             throw new InsufficientAuthenticationException(UserErrorCode.USER_NOT_FOUND.getMessage());
         }

@@ -28,14 +28,13 @@ public class RedisConnectionConfig {
 
 
     @Bean(name = "lettuceConnectionFactory")
-    @Primary
     public RedisConnectionFactory lettuceConnectionFactory() {
         return new LettuceConnectionFactory();
     }
 
     @Bean(name = "redissonConnectionFactory")
-    public RedisConnectionFactory redissonConnectionFactory(
-            @Qualifier("redissonClient") RedissonClient redissonClient) {
+    @Primary
+    public RedisConnectionFactory redissonConnectionFactory(RedissonClient redissonClient) {
         return new RedissonConnectionFactory(redissonClient);
     }
 }

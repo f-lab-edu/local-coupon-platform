@@ -1,0 +1,8 @@
+localcoupon:
+  redis:
+    session-ttl: 3600
+    session-prefix: "SESSION:"
+    coupon-ready-prefix: "coupon:ready:"
+    coupon-open-prefix: "coupon:open:"
+    coupon-lock-prefix: "coupon:lock:"
+    duplicate-request-lock-prefix: "DUPLICATE_REQUEST_LOCK"
