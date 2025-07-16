@@ -3,7 +3,7 @@ package com.localcoupon.couponservice.auth.repository.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.localcoupon.couponservice.auth.dto.UserSessionDto;
-import com.localcoupon.couponservice.auth.repository.SessionRepoistory;
+import com.localcoupon.couponservice.auth.repository.SessionRepository;
 import com.localcoupon.couponservice.common.enums.CommonErrorCode;
 import com.localcoupon.couponservice.common.exception.CommonException;
 import com.localcoupon.couponservice.common.infra.RedisProperties;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RedisSessionRepositoryImpl implements SessionRepoistory {
+public class RedisSessionRepositoryImpl implements SessionRepository {
 
     private final StringRedisTemplate redisTemplate;
     private final ObjectMapper objectMapper;
