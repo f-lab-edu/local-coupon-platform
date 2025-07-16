@@ -8,17 +8,18 @@ import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.enums.CouponStock;
 import com.localcoupon.couponservice.store.entity.Store;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "coupon")
+@Builder
+@AllArgsConstructor
 public class Coupon extends BaseEntity {
 
     @Id
@@ -44,10 +45,10 @@ public class Coupon extends BaseEntity {
     private String description;
 
     @Column(name = "coupon_total_count")
-    private Integer totalCount;
+    private int totalCount;
 
     @Column(name = "coupon_issued_count")
-    private Integer issuedCount;
+    private int issuedCount;
 
     @Column(name = "coupon_valid_start_time")
     private LocalDateTime couponValidStartTime;
@@ -60,6 +61,9 @@ public class Coupon extends BaseEntity {
 
     @Column(name = "coupon_issue_end_time")
     private LocalDateTime couponIssueEndTime;
+
+    public Coupon() {
+    }
 
     public Coupon(
             CouponScope scope,
@@ -84,6 +88,19 @@ public class Coupon extends BaseEntity {
         this.couponValidEndTime = couponValidEndTime;
         this.couponIssueStartTime = couponIssueStartTime;
         this.couponIssueEndTime = couponIssueEndTime;
+    }
+
+    public boolean isExpiredForUse(LocalDateTime now) {
+        return now.isAfter(couponValidEndTime);
+    }
+
+    public boolean isExpiredForIssue(LocalDateTime now) {
+        return now.isAfter(couponIssueEndTime);
+    }
+
+    public Coupon syncIssuedCount(int redisIssuedCount) {
+        this.issuedCount = redisIssuedCount;
+        return this;
     }
 
     public static Coupon from(CouponCreateRequestDto request, Store store) {
