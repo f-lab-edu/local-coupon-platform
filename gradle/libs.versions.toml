@@ -6,8 +6,12 @@ argon2 = "2.11"
 redisson = "3.27.2"
 querydsl = "5.0.0"
 asciidoctor = "3.3.2"
+cloudinary = "2.0.0"
+zxing = "3.5.3"
 
 [libraries]
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
+zxing-javase = { module = "com.google.zxing:javase", version.ref = "zxing" }
 spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "spring-boot" }
 spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "spring-boot" }
 spring-boot-starter-data-redis = { module = "org.springframework.boot:spring-boot-starter-data-redis", version.ref = "spring-boot" }
@@ -15,20 +19,21 @@ spring-boot-starter-validation = { module = "org.springframework.boot:spring-boo
 spring-boot-starter-aop = { module = "org.springframework.boot:spring-boot-starter-aop", version.ref = "spring-boot" }
 spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security", version.ref = "spring-boot" }
 spring-boot-starter-batch = { module = "org.springframework.boot:spring-boot-starter-batch", version.ref = "spring-boot" }
-spring-security-test = { module = "org.springframework.security:spring-security-test", version.ref = "spring-boot" }
+spring-security-test = { module = "org.springframework.security:spring-security-test", version = "6.2.0" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }
 mysql-connector = { module = "com.mysql:mysql-connector-j", version.ref = "mysql" }
 argon2-jvm = { module = "de.mkammerer:argon2-jvm", version.ref = "argon2" }
 redisson-spring = { module = "org.redisson:redisson-spring-data-30", version.ref = "redisson" }
-spring-cloud-openfeign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign", version.ref = "spring-cloud" }
+spring-cloud-openfeign = { module = "org.springframework.cloud:spring-cloud-starter-openfeign", version = "4.1.1" }
 spring-restdocs-mockmvc = { module = "org.springframework.restdocs:spring-restdocs-mockmvc", version = "3.0.0" }
-asciidoctor = { module = "org.asciidoctor.jvm.convert", version.ref = "asciidoctor" }
 
 lombok = { module = "org.projectlombok:lombok", version = "1.18.30" }
 
-querydsl-jpa = { module = "com.querydsl:querydsl-jpa", version.ref = "querydsl" }
 querydsl-core = { module = "com.querydsl:querydsl-core", version.ref = "querydsl" }
 querydsl-collections = { module = "com.querydsl:querydsl-collections", version.ref = "querydsl" }
-querydsl-apt = { module = "com.querydsl:querydsl-apt", version.ref = "querydsl" }
 jakarta-annotation-api = { module = "jakarta.annotation:jakarta.annotation-api", version = "2.1.1" }
 jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-api", version = "3.1.0" }
+
+cloudinary-api = { module = "com.cloudinary:cloudinary-http5", version.ref = "cloudinary" }
+
+
