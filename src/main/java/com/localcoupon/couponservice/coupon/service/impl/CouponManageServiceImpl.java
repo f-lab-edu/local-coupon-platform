@@ -2,7 +2,6 @@ package com.localcoupon.couponservice.coupon.service.impl;
 
 import com.localcoupon.couponservice.common.dto.request.CursorPageRequest;
 import com.localcoupon.couponservice.common.dto.response.ResultResponseDto;
-import com.localcoupon.couponservice.common.enums.Result;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
@@ -14,6 +13,7 @@ import com.localcoupon.couponservice.coupon.exception.UserCouponException;
 import com.localcoupon.couponservice.coupon.repository.CouponRepository;
 import com.localcoupon.couponservice.coupon.repository.IssuedCouponRepository;
 import com.localcoupon.couponservice.coupon.service.CouponManageService;
+import com.localcoupon.couponservice.coupon.service.QrTokenService;
 import com.localcoupon.couponservice.store.entity.Store;
 import com.localcoupon.couponservice.store.enums.StoreErrorCode;
 import com.localcoupon.couponservice.store.exception.StoreException;
@@ -30,6 +30,7 @@ public class CouponManageServiceImpl implements CouponManageService {
     private final CouponRepository couponRepository;
     private final StoreRepository storeRepository;
     private final IssuedCouponRepository issuedCouponRepository;
+    private final QrTokenService qrTokenService;
 
     @Override
     @Transactional
@@ -77,20 +78,28 @@ public class CouponManageServiceImpl implements CouponManageService {
     public ResultResponseDto deleteCoupon(Long couponId, Long userId) {
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new UserCouponException(UserCouponErrorCode.COUPON_NOT_FOUND));
-        coupon.delete();
-        return ResultResponseDto.from(Result.SUCCESS);
+        return ResultResponseDto.from(coupon.delete());
     }
 
     @Override
     @Transactional
-    public CouponVerifyResponseDto verifyCoupon(String qrToken) {
+    public CouponVerifyResponseDto verifyCoupon(String qrToken, Long userId) {
+        // QR 토큰에서 유효기간과 쿠폰 ID 추출
+        qrTokenService.isTokenValid(qrToken);
+
         // 유저의 발급 내역 조회
         IssuedCoupon issuedCoupon = issuedCouponRepository.findByQrToken(qrToken)
                 .orElseThrow(() -> new UserCouponException(UserCouponErrorCode.COUPON_NOT_FOUND));
 
-        //쿠폰 사용처리
+        // 이미 사용된 쿠폰은 처리하지 않음
+        if (issuedCoupon.isUsed()) {
+            throw new UserCouponException(UserCouponErrorCode.ALREADY_COUPON_USED);
+        }
+
+        // 쿠폰 사용 처리
         IssuedCoupon usedCoupon = issuedCoupon.use();
 
+        // 사용처리된 쿠폰 정보를 DTO로 반환
         return CouponVerifyResponseDto.of(
                 usedCoupon.getCoupon().getId(),
                 true
