@@ -21,5 +21,5 @@ public interface CouponManageService {
 
     ResultResponseDto deleteCoupon(Long couponId, Long userId);
 
-    CouponVerifyResponseDto verifyCoupon(String qrToken);
+    CouponVerifyResponseDto verifyCoupon(String qrToken, Long userId);
 }

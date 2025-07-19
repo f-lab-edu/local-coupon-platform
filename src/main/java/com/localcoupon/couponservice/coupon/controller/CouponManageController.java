@@ -7,7 +7,9 @@ import com.localcoupon.couponservice.common.dto.response.ResultResponseDto;
 import com.localcoupon.couponservice.common.dto.response.SuccessResponse;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
+import com.localcoupon.couponservice.coupon.dto.request.CouponVerifyRequestDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
+import com.localcoupon.couponservice.coupon.dto.response.CouponVerifyResponseDto;
 import com.localcoupon.couponservice.coupon.service.CouponManageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -66,5 +68,12 @@ public class CouponManageController {
         return SuccessResponse.of(
                 couponManageService.deleteCoupon(couponId, user.getId())
         );
+    }
+
+    @PostMapping("/coupons/verify")
+    public SuccessResponse<CouponVerifyResponseDto> verifyCoupon(@RequestBody CouponVerifyRequestDto request,
+                                                                 @AuthenticationPrincipal CustomUserDetails user) {
+        CouponVerifyResponseDto response = couponManageService.verifyCoupon(request.qrToken(), user.getId());
+        return SuccessResponse.of(response);
     }
 }

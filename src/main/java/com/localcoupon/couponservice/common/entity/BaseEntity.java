@@ -1,6 +1,7 @@
 package com.localcoupon.couponservice.common.entity;
 
 import com.localcoupon.couponservice.common.constants.BaseColumns;
+import com.localcoupon.couponservice.common.enums.Result;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -26,8 +27,8 @@ public abstract class BaseEntity {
     @Column(name = BaseColumns.IS_DELETED, nullable = false)
     protected boolean isDeleted = false;
 
-    public boolean delete() {
+    public Result delete() {
         this.isDeleted = true;
-        return true;
+        return Result.SUCCESS;
     }
 }

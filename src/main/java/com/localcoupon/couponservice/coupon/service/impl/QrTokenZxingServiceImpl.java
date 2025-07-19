@@ -50,10 +50,14 @@ public class QrTokenZxingServiceImpl implements QrTokenService {
     public boolean isTokenValid(String token) {
         return Stream.of(token)
                 .map(data -> new String(Base64.getDecoder().decode(data), StandardCharsets.UTF_8))
-                .filter(data -> data.split(":").length == 2)
-                .map(data -> data.split(":")[1])
-                .map(LocalDateTime::parse)
-                .anyMatch(time -> !time.isBefore(LocalDateTime.now()));
+                .filter(data -> data.split(":").length == 4)
+                .anyMatch(data -> {
+                    String[] parts = data.split(":");
+                    LocalDateTime start = LocalDateTime.parse(parts[2]);
+                    LocalDateTime end = LocalDateTime.parse(parts[3]);
+                    LocalDateTime now = LocalDateTime.now();
+                    return !now.isBefore(start) && !now.isAfter(end);  // start <= now <= end
+                });
     }
 
     private BufferedImage generateQrImage(String content) throws WriterException {
