@@ -3,8 +3,8 @@ package com.localcoupon.couponservice.coupon.controller;
 import com.localcoupon.couponservice.auth.security.CustomUserDetails;
 import com.localcoupon.couponservice.common.constants.ApiMapping;
 import com.localcoupon.couponservice.common.dto.request.CursorPageRequest;
-import com.localcoupon.couponservice.common.dto.response.ResultResponseDto;
 import com.localcoupon.couponservice.common.dto.response.SuccessResponse;
+import com.localcoupon.couponservice.common.enums.Result;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponVerifyRequestDto;
@@ -61,7 +61,7 @@ public class CouponManageController {
     }
 
     @DeleteMapping("/coupons/{couponId}")
-    public SuccessResponse<ResultResponseDto> deleteCoupon(
+    public SuccessResponse<Result> deleteCoupon(
             @PathVariable Long couponId,
             @AuthenticationPrincipal CustomUserDetails user
     ) {
