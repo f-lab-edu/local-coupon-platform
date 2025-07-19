@@ -15,7 +15,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -80,7 +79,6 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("로그아웃 API 문서화")
-    @WithMockUser(username = "test@example.com", roles = "USER")
     void logout() throws Exception {
         // given
         String token = "abcd-1234";

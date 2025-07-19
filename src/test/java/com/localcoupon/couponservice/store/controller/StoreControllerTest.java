@@ -1,9 +1,7 @@
 package com.localcoupon.couponservice.store.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.localcoupon.couponservice.auth.filter.AuthFilter;
-import com.localcoupon.couponservice.auth.security.CustomUserDetails;
+import com.localcoupon.couponservice.common.TestSecurityConfig;
 import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
 import com.localcoupon.couponservice.store.dto.request.UserStoreSearchRequestDto;
 import com.localcoupon.couponservice.store.dto.response.StoreResponseDto;
@@ -13,17 +11,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -40,35 +35,34 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(RestDocumentationExtension.class)
-@WebMvcTest(controllers = StoreController.class,
-        excludeFilters = {
-                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = AuthFilter.class)
-        })
-class StoreControllerTest {
+@Import(TestSecurityConfig.class)
+@WebMvcTest(controllers = StoreController.class)
+class StoreControllerTest { ;
 
-    private MockMvc mockMvc;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @MockBean
+    @MockitoBean
     private StoreService storeService;
+    @Autowired
+    private MockMvc mockMvc;
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
-        this.objectMapper.findAndRegisterModules();
-        this.objectMapper.registerModule(new JavaTimeModule());
+    void setUp(RestDocumentationContextProvider provider, WebApplicationContext context) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(springSecurity())
                 .apply(org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration(provider))
                 .build();
 
-        setSecurityContextHolder();
+//        setSecurityContextHolder();
     }
 
     @Test
     @DisplayName("매장 등록 API")
-    void registerStore() throws Exception {
+    @WithMockUser(username = "test@naver.com")
+   void registerStore() throws Exception {
         StoreRequestDto requestDto = new StoreRequestDto(
                 "스타벅스",
                 "서울특별시 송파구 법원로 55",
@@ -91,7 +85,7 @@ class StoreControllerTest {
                 LocalDateTime.of(2025, 6, 1, 10, 0)
         );
 
-        when(storeService.registerStore(any(StoreRequestDto.class), eq("test@naver.com")))
+        when(storeService.registerStore(any(StoreRequestDto.class), any(Long.class)))
                 .thenReturn(responseDto);
 
         String json = objectMapper.writeValueAsString(requestDto);
@@ -244,23 +238,4 @@ class StoreControllerTest {
                         )
                 ));
     }
-
-    private void setSecurityContextHolder() {
-        CustomUserDetails customUserDetails = new CustomUserDetails(
-                1L,
-                "test@naver.com",
-                "dong",
-                List.of(new SimpleGrantedAuthority("ROLE_USER"))
-        );
-
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(
-                        customUserDetails,
-                        null,
-                        customUserDetails.getAuthorities()
-                );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
-
 }

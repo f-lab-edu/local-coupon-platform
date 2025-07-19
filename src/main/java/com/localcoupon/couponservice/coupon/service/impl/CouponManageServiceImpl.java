@@ -1,7 +1,7 @@
 package com.localcoupon.couponservice.coupon.service.impl;
 
 import com.localcoupon.couponservice.common.dto.request.CursorPageRequest;
-import com.localcoupon.couponservice.common.dto.response.ResultResponseDto;
+import com.localcoupon.couponservice.common.enums.Result;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
@@ -75,10 +75,10 @@ public class CouponManageServiceImpl implements CouponManageService {
 
     @Override
     @Transactional
-    public ResultResponseDto deleteCoupon(Long couponId, Long userId) {
+    public Result deleteCoupon(Long couponId, Long userId) {
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new UserCouponException(UserCouponErrorCode.COUPON_NOT_FOUND));
-        return ResultResponseDto.from(coupon.delete());
+        return coupon.delete();
     }
 
     @Override
