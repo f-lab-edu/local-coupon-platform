@@ -101,7 +101,7 @@ public class CouponManageServiceImpl implements CouponManageService {
 
         // 사용처리된 쿠폰 정보를 DTO로 반환
         return CouponVerifyResponseDto.of(
-                usedCoupon.getCoupon().getId(),
+                usedCoupon.getId(),
                 true
         );
     }

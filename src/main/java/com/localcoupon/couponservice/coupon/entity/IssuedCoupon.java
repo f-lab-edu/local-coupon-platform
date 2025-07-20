@@ -49,4 +49,9 @@ public class IssuedCoupon {
         this.usedAt = LocalDateTime.now();
         return this;
     }
+
+    public void createQrToken(String token) {
+        this.qrToken = token;
+    }
+
 }
