@@ -42,7 +42,8 @@ public class AuthFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        if (Arrays.asList(SecurityConfig.NO_AUTH_APIS).contains(request.getRequestURI())) {
+        if (Arrays.stream(SecurityConfig.NO_AUTH_APIS)
+                .anyMatch(uri -> uri.startsWith(request.getRequestURI()))) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -92,4 +93,11 @@ public class AuthFilter extends OncePerRequestFilter {
                         customUserDetails.getAuthorities()
                 );
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return Arrays.asList(SecurityConfig.NO_AUTH_APIS)
+                .contains(request.getRequestURI());
+    }
+
 }

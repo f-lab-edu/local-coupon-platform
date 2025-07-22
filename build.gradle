@@ -82,6 +82,8 @@ dependencies {
 
 
 	implementation libs.cloudinary.api
+	implementation libs.actuator
+	implementation libs.prometheus
 }
 
 ext {

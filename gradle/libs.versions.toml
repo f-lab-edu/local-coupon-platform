@@ -36,4 +36,7 @@ jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-ap
 
 cloudinary-api = { module = "com.cloudinary:cloudinary-http5", version.ref = "cloudinary" }
 
+actuator = {module = "org.springframework.boot:spring-boot-starter-actuator", version.ref="spring-boot"}
+prometheus = {module="io.micrometer:micrometer-registry-prometheus"}
+
 
