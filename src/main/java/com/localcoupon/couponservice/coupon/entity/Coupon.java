@@ -119,8 +119,12 @@ public class Coupon extends BaseEntity {
         );
     }
 
-    public IssuedCoupon issue(User user, String qrToken, LocalDateTime issuedAt) {
-        return IssuedCoupon.of(user,this,qrToken, issuedAt);
+    public IssuedCoupon issue(User user, String qrToken, String qrImageUrl, LocalDateTime issuedAt) {
+        return IssuedCoupon.of(user,this,qrToken, qrImageUrl, issuedAt);
+    }
+
+    public IssuedCoupon issueWithOutQrCode(User user,  LocalDateTime issuedAt) {
+        return IssuedCoupon.of(user,this,issuedAt);
     }
 
     public Result update(CouponUpdateRequestDto request) {
