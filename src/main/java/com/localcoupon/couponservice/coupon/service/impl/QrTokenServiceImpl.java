@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
-public class QrTokenZxingServiceImpl implements QrTokenService {
+public class QrTokenServiceImpl implements QrTokenService {
     private final ImageService cloudinaryService;
 
     @Override

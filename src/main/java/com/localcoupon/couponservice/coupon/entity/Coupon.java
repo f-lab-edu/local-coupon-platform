@@ -7,6 +7,7 @@ import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.enums.CouponStock;
 import com.localcoupon.couponservice.store.entity.Store;
+import com.localcoupon.couponservice.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -116,6 +117,10 @@ public class Coupon extends BaseEntity {
                 request.couponIssueEndTime(),
                 store
         );
+    }
+
+    public IssuedCoupon issue(User user, String qrToken, LocalDateTime issuedAt) {
+        return IssuedCoupon.of(user,this,qrToken, issuedAt);
     }
 
     public Result update(CouponUpdateRequestDto request) {

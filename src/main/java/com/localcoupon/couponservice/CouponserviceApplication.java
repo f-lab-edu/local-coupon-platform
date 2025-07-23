@@ -5,10 +5,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication
 @EnableFeignClients(basePackages = "com.localcoupon.couponservice.common.external") //FeignClient 빈 주입
 @EnableConfigurationProperties(RedisProperties.class)
+@EnableAsync
 public class CouponserviceApplication {
 
 	public static void main(String[] args) {

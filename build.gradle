@@ -58,6 +58,8 @@ dependencies {
 	implementation libs.spring.boot.starter.aop
 	implementation libs.spring.boot.starter.security
 	implementation libs.spring.boot.starter.batch
+	implementation libs.spring.boot.starter.mail
+	implementation libs.actuator
 
 	compileOnly libs.lombok
 	runtimeOnly libs.mysql.connector
@@ -80,10 +82,10 @@ dependencies {
 	implementation libs.zxing.core
 	implementation libs.zxing.javase
 
-
 	implementation libs.cloudinary.api
-	implementation libs.actuator
 	implementation libs.prometheus
+
+
 }
 
 ext {

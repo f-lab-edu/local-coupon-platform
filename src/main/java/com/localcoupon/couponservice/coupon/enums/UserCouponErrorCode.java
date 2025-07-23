@@ -10,7 +10,8 @@ public enum UserCouponErrorCode implements ErrorCode {
     COUPON_EXPIRED("쿠폰 유효기간이 만료되었습니다.", HttpStatus.BAD_REQUEST),
     ENDED_COUPON_ISSUE("쿠폰 발급기간이 종료되었습니다.", HttpStatus.BAD_REQUEST),
     COUPON_LOCK_FAILED("쿠폰 락 처리에 실패하였습니다.", HttpStatus.CONFLICT),
-    COUPON_KEY_PARSING_FAILED("쿠폰 키 파싱 처리에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    COUPON_KEY_PARSING_FAILED("쿠폰 키 파싱 처리에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    COUPON_MAIL_SEND_FAILED("쿠폰 메일 발송에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final String message;
     private final HttpStatus status;

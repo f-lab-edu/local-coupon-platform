@@ -41,6 +41,15 @@ public class IssuedCoupon {
     @Column(name = "is_used")
     private boolean isUsed;
 
+    public IssuedCoupon(User user, Coupon coupon, LocalDateTime issuedAt, LocalDateTime usedAt, String qrToken, boolean isUsed) {
+        this.user = user;
+        this.coupon = coupon;
+        this.issuedAt = issuedAt;
+        this.usedAt = usedAt;
+        this.qrToken = qrToken;
+        this.isUsed = isUsed;
+    }
+
     public IssuedCoupon use() {
         if (this.isUsed) {
             throw new UserCouponException(UserCouponErrorCode.ALREADY_COUPON_USED);
@@ -50,8 +59,7 @@ public class IssuedCoupon {
         return this;
     }
 
-    public void createQrToken(String token) {
-        this.qrToken = token;
+    public static IssuedCoupon of(User user, Coupon coupon, String qrToken, LocalDateTime issuedAt) {
+        return new IssuedCoupon(user,coupon,issuedAt,null,qrToken,false);
     }
-
 }
