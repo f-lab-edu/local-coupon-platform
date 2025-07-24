@@ -38,7 +38,6 @@ jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-ap
 
 cloudinary-api = { module = "com.cloudinary:cloudinary-http5", version.ref = "cloudinary" }
 
+
 prometheus = {module="io.micrometer:micrometer-registry-prometheus"}
-
-
 

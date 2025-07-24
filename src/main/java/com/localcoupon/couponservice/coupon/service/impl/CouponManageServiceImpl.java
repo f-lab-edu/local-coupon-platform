@@ -78,6 +78,7 @@ public class CouponManageServiceImpl implements CouponManageService {
     public Result deleteCoupon(Long couponId, Long userId) {
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new UserCouponException(UserCouponErrorCode.COUPON_NOT_FOUND));
+
         return coupon.delete();
     }
 
