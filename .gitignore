@@ -38,11 +38,7 @@ out/
 
 # Environment files (중요!)
 *.env
-application*.yml
-application*.properties
 .env
 
 # Local config
-src/main/resources/application.yml
-src/main/resources/application-*.yml
 src/main/generated/

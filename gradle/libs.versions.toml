@@ -21,6 +21,8 @@ spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-
 spring-boot-starter-batch = { module = "org.springframework.boot:spring-boot-starter-batch", version.ref = "spring-boot" }
 spring-security-test = { module = "org.springframework.security:spring-security-test", version = "6.2.0" }
 spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "spring-boot" }
+actuator = {module = "org.springframework.boot:spring-boot-starter-actuator", version.ref="spring-boot"}
+spring-boot-starter-mail = {module="org.springframework.boot:spring-boot-starter-mail", version.ref="spring-boot"}
 mysql-connector = { module = "com.mysql:mysql-connector-j", version.ref = "mysql" }
 argon2-jvm = { module = "de.mkammerer:argon2-jvm", version.ref = "argon2" }
 redisson-spring = { module = "org.redisson:redisson-spring-data-30", version.ref = "redisson" }
@@ -36,4 +38,6 @@ jakarta-persistence-api = { module = "jakarta.persistence:jakarta.persistence-ap
 
 cloudinary-api = { module = "com.cloudinary:cloudinary-http5", version.ref = "cloudinary" }
 
+
+prometheus = {module="io.micrometer:micrometer-registry-prometheus"}
 

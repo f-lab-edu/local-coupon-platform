@@ -9,5 +9,5 @@ public interface UserCouponService {
 
     List<UserIssuedCouponResponseDto> getUserCoupons();
 
-    Result issueCoupon(Long couponId);
+    Result issueCoupon(Long userId, Long couponId);
 }

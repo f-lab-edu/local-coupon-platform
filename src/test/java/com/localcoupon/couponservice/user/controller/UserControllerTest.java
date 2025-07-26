@@ -1,8 +1,8 @@
 package com.localcoupon.couponservice.user.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.localcoupon.couponservice.auth.filter.AuthFilter;
 import com.localcoupon.couponservice.auth.service.AuthService;
+import com.localcoupon.couponservice.common.TestSecurityConfig;
 import com.localcoupon.couponservice.user.dto.request.SignUpRequestDto;
 import com.localcoupon.couponservice.user.dto.response.UserResponseDto;
 import com.localcoupon.couponservice.user.service.UserService;
@@ -10,22 +10,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
-import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -34,21 +29,20 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(RestDocumentationExtension.class)
-@WebMvcTest(controllers = UserController.class,
-        excludeFilters = {
-                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = AuthFilter.class)
-        })
+@Import(TestSecurityConfig.class)
+@WebMvcTest(controllers = UserController.class)
 class UserControllerTest {
 
-    @MockBean
+    @MockitoBean
     private UserService userService;
-
-    @MockBean
+    @MockitoBean
     private AuthService authService;
 
+    @Autowired
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -56,20 +50,13 @@ class UserControllerTest {
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
+                .apply(springSecurity())
                 .apply(org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration(provider))
                 .build();
-
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken(
-                        "test@example.com", // Principal (userEmail)
-                        null,
-                        List.of(new SimpleGrantedAuthority("USER_ROLE")) // 권한
-                )
-        );
     }
 
     @Test
-    @DisplayName("회원가입 API 문서화")
+    @DisplayName("사용자가 회원가입 요청합니다.")
     void createUser() throws Exception {
         SignUpRequestDto requestDto = new SignUpRequestDto("test@example.com", "password123", "tester", "서울시", "110105");
         UserResponseDto responseDto = new UserResponseDto("test@example.com", "tester", "서울시", "110105");
@@ -105,7 +92,7 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("내 정보 조회 API 문서화")
+    @DisplayName("내 정보를 조회한다.")
     void getUser() throws Exception {
         String email = "test@example.com";
         UserResponseDto responseDto = new UserResponseDto(email, "tester", "서울시", "110105");

@@ -38,8 +38,27 @@ public class IssuedCoupon {
     @Column(name = "qr_token")
     private String qrToken;
 
+    @Column(name = "qr_image_url")
+    private String qrImageUrl;
+
     @Column(name = "is_used")
     private boolean isUsed;
+
+    public IssuedCoupon(User user, Coupon coupon, LocalDateTime issuedAt, LocalDateTime usedAt, String qrToken, boolean isUsed, String qrImageUrl) {
+        this.user = user;
+        this.coupon = coupon;
+        this.issuedAt = issuedAt;
+        this.usedAt = usedAt;
+        this.qrToken = qrToken;
+        this.qrImageUrl = qrImageUrl;
+        this.isUsed = isUsed;
+    }
+
+    public IssuedCoupon(User user, Coupon coupon, LocalDateTime issuedAt) {
+        this.user = user;
+        this.coupon = coupon;
+        this.issuedAt = issuedAt;
+    }
 
     public IssuedCoupon use() {
         if (this.isUsed) {
@@ -48,5 +67,13 @@ public class IssuedCoupon {
         this.isUsed = true;
         this.usedAt = LocalDateTime.now();
         return this;
+    }
+
+    public static IssuedCoupon of(User user, Coupon coupon, String qrToken,  String qrImageUrl, LocalDateTime issuedAt) {
+        return new IssuedCoupon(user,coupon,issuedAt,null,qrToken,false, qrImageUrl);
+    }
+
+    public static IssuedCoupon of(User user, Coupon coupon, LocalDateTime issuedAt) {
+        return new IssuedCoupon(user,coupon,issuedAt);
     }
 }

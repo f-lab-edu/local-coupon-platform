@@ -1,0 +1,23 @@
+package com.localcoupon.couponservice.coupon.annotation;
+
+import com.localcoupon.couponservice.coupon.entity.CouponPeriod;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+
+import java.time.LocalDateTime;
+
+public class PeriodValidator implements ConstraintValidator<ValidPeriod, CouponPeriod> {
+
+    @Override
+    public boolean isValid(CouponPeriod CouponPeriod, ConstraintValidatorContext constraintValidatorContext) {
+        if(CouponPeriod == null) {
+            return false;
+        }
+        LocalDateTime start = CouponPeriod.start();
+        LocalDateTime end = CouponPeriod.end();
+
+        if (start == null || end == null) return false;
+        if (end.isBefore(start)) return false;
+        return true;
+    }
+}

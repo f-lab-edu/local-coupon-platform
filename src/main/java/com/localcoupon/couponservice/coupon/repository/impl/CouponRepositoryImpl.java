@@ -58,6 +58,10 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 
     //QueryDSL은 WHERE절 조건을 Predicate BooleanExpression으로 받는다.
     private BooleanExpression cursorPaging(QCoupon coupon, CursorPageRequest request) {
+        if (request.cursor() == null || request.cursor() == 0) {
+            return coupon.id.isNotNull();  // 처음에는 모든 데이터 조회
+        }
+
         return Optional.ofNullable(request.cursor())
                 .map(cursor -> {
                     if (request.direction() == SortDirection.ASCENDING) {
