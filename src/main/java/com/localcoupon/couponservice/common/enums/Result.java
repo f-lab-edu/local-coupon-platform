@@ -12,4 +12,8 @@ public enum Result {
     public int getValue() {
         return code;
     }
+
+    public boolean isSuccess() {
+        return this == Result.SUCCESS;
+    }
 }

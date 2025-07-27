@@ -1,7 +1,7 @@
 package com.localcoupon.couponservice.coupon.service;
 
 import com.localcoupon.couponservice.common.dto.request.CursorPageRequest;
-import com.localcoupon.couponservice.common.dto.response.ResultResponseDto;
+import com.localcoupon.couponservice.common.enums.Result;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
@@ -19,7 +19,7 @@ public interface CouponManageService {
 
     CouponResponseDto updateCoupon(Long couponId, Long userId, CouponUpdateRequestDto request);
 
-    ResultResponseDto deleteCoupon(Long couponId, Long userId);
+    Result deleteCoupon(Long couponId, Long userId);
 
     CouponVerifyResponseDto verifyCoupon(String qrToken, Long userId);
 }
