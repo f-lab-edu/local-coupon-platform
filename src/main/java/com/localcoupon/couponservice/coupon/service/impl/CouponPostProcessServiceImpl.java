@@ -1,6 +1,5 @@
 package com.localcoupon.couponservice.coupon.service.impl;
 
-import com.localcoupon.couponservice.common.enums.Result;
 import com.localcoupon.couponservice.coupon.dto.CouponPostProcessDto;
 import com.localcoupon.couponservice.coupon.entity.IssuedCoupon;
 import com.localcoupon.couponservice.coupon.repository.IssuedCouponRepository;
@@ -10,9 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -23,29 +19,26 @@ public class CouponPostProcessServiceImpl implements CouponPostProcessService {
     private final IssuedCouponRepository issuedCouponRepository;
 
     @Async
-    @Transactional
-    public CompletableFuture<Result> sendQrCouponToUser(CouponPostProcessDto couponPostProcessDto, IssuedCoupon issuedCoupon) {
+    public void sendQrCouponToUser(CouponPostProcessDto dto, IssuedCoupon issuedCoupon) {
         try {
-            // 1.QR 토큰 생성
+            // 1. QR 토큰 생성
             String qrToken = qrTokenService.generateQrToken(
-                    couponPostProcessDto.issuedCouponId(), couponPostProcessDto.issuedCouponValidStartTime(), couponPostProcessDto.issuedCouponValidEndTime()
+                    dto.issuedCouponId(), dto.issuedCouponValidStartTime(), dto.issuedCouponValidEndTime()
             );
 
-            // 2.Cloudinary에 QR 이미지 업로드
+            // 2. Cloudinary 업로드
             String qrImageUrl = qrTokenService.uploadQrImage(qrToken);
 
-            // 3. 유저에게 이메일 발송
-            Result result = couponMailService.sendCouponEmail(couponPostProcessDto.userEmail(), couponPostProcessDto.couponTitle(), qrImageUrl);
+            // 3. 이메일 발송
+            couponMailService.sendCouponEmail(dto.userEmail(), dto.couponTitle(), qrImageUrl);
 
-            // 4. issuedCoupon 후처리
-            IssuedCoupon updatedIssuedCoupon = issuedCouponRepository.save(issuedCoupon);
+            // 4. 발급 쿠폰 업데이트
+            issuedCouponRepository.save(issuedCoupon);
 
-            log.info("[CouponPostProcessService] 쿠폰 발급 후처리 완료 issuedCouponId={}, userId={}", couponPostProcessDto.issuedCouponId(), couponPostProcessDto.userId());
-            return CompletableFuture.completedFuture(Result.SUCCESS);
-
+            log.info("[CouponPostProcessService] 후처리 완료 issuedCouponId={}, userId={}", dto.issuedCouponId(), dto.userId());
         } catch (Exception e) {
-            log.error("[CouponPostProcessService] 쿠폰 발급 후처리 실패 issuedCouponId={}, userId={}", couponPostProcessDto.issuedCouponId(), couponPostProcessDto.userId(), e);
-            return CompletableFuture.completedFuture(Result.FAIL);
+            // TODO 실패 시 처리 방안
+            log.error("[CouponPostProcessService] 후처리 실패 issuedCouponId={}, userId={}", dto.issuedCouponId(), dto.userId(), e);
         }
     }
 }

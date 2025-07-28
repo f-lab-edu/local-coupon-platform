@@ -14,10 +14,11 @@ import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponVerifyRequestDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponVerifyResponseDto;
+import com.localcoupon.couponservice.coupon.dto.response.ListCouponResponseDto;
+import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.service.CouponManageService;
 import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
-import com.localcoupon.couponservice.store.dto.response.StoreResponseDto;
 import com.localcoupon.couponservice.store.entity.Store;
 import com.localcoupon.couponservice.store.enums.StoreCategory;
 import com.localcoupon.couponservice.user.enums.UserRole;
@@ -137,8 +138,7 @@ class CouponManageControllerTest {
                 LocalDateTime.of(2025, 7, 1, 0, 0),
                 LocalDateTime.of(2025, 7, 2, 0, 0),
                 LocalDateTime.of(2025, 7, 1, 0, 0),
-                LocalDateTime.of(2025, 7, 2, 0, 0),
-                StoreResponseDto.fromEntity(store)
+                LocalDateTime.of(2025, 7, 2, 0, 0)
         );
 
         when(couponManageService.createCoupon(any(CouponCreateRequestDto.class), any(Long.class))).thenReturn(responseDto);
@@ -203,22 +203,20 @@ class CouponManageControllerTest {
                 ),
                 1L
         );
-
-        CouponResponseDto responseDto = new CouponResponseDto(
-                1L,
+        CouponCreateRequestDto requestDto = new CouponCreateRequestDto(
                 "봄맞이 할인",
                 "봄 시즌 한정 쿠폰입니다.",
                 CouponScope.NATIONAL,
                 100,
-                0,
                 LocalDateTime.of(2025, 7, 1, 0, 0),
                 LocalDateTime.of(2025, 7, 2, 0, 0),
                 LocalDateTime.of(2025, 7, 1, 0, 0),
-                LocalDateTime.of(2025, 7, 2, 0, 0),
-                StoreResponseDto.fromEntity(store)
+                LocalDateTime.of(2025, 7, 2, 0, 0)
         );
 
-        when(couponManageService.getCouponsByOwner(any(Long.class), any(CursorPageRequest.class))).thenReturn(List.of(responseDto));
+        ListCouponResponseDto responseDto = ListCouponResponseDto.from(List.of(Coupon.from(requestDto, store)));
+
+        when(couponManageService.getCouponsByOwner(any(Long.class), any(CursorPageRequest.class))).thenReturn(responseDto);
 
 
         mockMvc.perform(get(ApiMapping.COUPON_MANAGE_BASE + "/coupons")
@@ -284,8 +282,7 @@ class CouponManageControllerTest {
                 LocalDateTime.of(2025, 7, 1, 0, 0),
                 LocalDateTime.of(2025, 7, 2, 0, 0),
                 LocalDateTime.of(2025, 7, 1, 0, 0),
-                LocalDateTime.of(2025, 7, 2, 0, 0),
-                StoreResponseDto.fromEntity(store)
+                LocalDateTime.of(2025, 7, 2, 0, 0)
         );
         when(couponManageService.getCouponDetail(couponId)).thenReturn(responseDto);
 
@@ -342,8 +339,7 @@ class CouponManageControllerTest {
                 LocalDateTime.of(2025, 7, 1, 0, 0),
                 LocalDateTime.of(2025, 7, 2, 0, 0),
                 LocalDateTime.of(2025, 7, 1, 0, 0),
-                LocalDateTime.of(2025, 7, 2, 0, 0),
-                StoreResponseDto.fromEntity(store)
+                LocalDateTime.of(2025, 7, 2, 0, 0)
         );
 
 

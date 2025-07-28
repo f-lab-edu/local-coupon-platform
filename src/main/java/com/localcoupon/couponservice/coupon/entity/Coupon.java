@@ -12,6 +12,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.hibernate.annotations.Where;
 import org.hibernate.validator.constraints.Length;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 @Table(name = "coupon")
 @Builder
 @AllArgsConstructor
+@Where(clause = "is_deleted = false")
 public class Coupon extends BaseEntity {
 
     @Id

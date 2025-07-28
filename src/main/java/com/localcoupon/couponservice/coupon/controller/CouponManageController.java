@@ -9,14 +9,13 @@ import com.localcoupon.couponservice.common.enums.Result;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponVerifyRequestDto;
-import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponVerifyResponseDto;
+import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
+import com.localcoupon.couponservice.coupon.dto.response.ListCouponResponseDto;
 import com.localcoupon.couponservice.coupon.service.CouponManageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +25,7 @@ public class CouponManageController {
     private final CouponManageService couponManageService;
 
     @GetMapping("/coupons")
-    public SuccessResponse<List<CouponResponseDto>> getCoupons(
+    public SuccessResponse<ListCouponResponseDto> getCoupons(
             @AuthenticationPrincipal CustomUserDetails user,
             @CursorRequest CursorPageRequest request
     ) {

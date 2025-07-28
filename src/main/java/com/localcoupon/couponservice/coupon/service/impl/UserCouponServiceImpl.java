@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -67,13 +66,7 @@ public class UserCouponServiceImpl implements UserCouponService {
 
         // 6. 발급 후 처리 진행
         couponPostProcessService.sendQrCouponToUser(CouponPostProcessDto.of(userId, user.getEmail(), coupon.getTitle(),
-                        issuedCoupon.getId(), coupon.getCouponValidStartTime(), coupon.getCouponValidEndTime()), issuedCoupon)
-                .orTimeout(5, TimeUnit.SECONDS)
-                .exceptionally(ex -> {
-                    log.error("[CouponPostProcess 후처리 실패] userId={}, couponId={}", userId, couponId, ex);
-                    //TODO 실패 시에는 어떻게 처리할 것인지?
-                    return Result.FAIL;
-                });;
+                        issuedCoupon.getId(), coupon.getCouponValidStartTime(), coupon.getCouponValidEndTime()), issuedCoupon);
 
         return Result.SUCCESS;
     }

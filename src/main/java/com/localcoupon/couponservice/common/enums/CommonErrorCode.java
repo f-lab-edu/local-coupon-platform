@@ -15,7 +15,8 @@ public enum CommonErrorCode implements ErrorCode {
     CLOUDINARY_OPERATION_ERROR("파일 처리 중 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR),
     QR_CREATE_OPERATION_ERROR("QR 생성 처리 중 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR),
     HTTP_METHOD_NOT_ALLOWED("허용되지 않는 HTTP 메소드 입니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    NO_STATIC_RESOURCE_API("API의 URL을 확인해주세요.", HttpStatus.INTERNAL_SERVER_ERROR);
+    NO_STATIC_RESOURCE_API("API의 URL을 확인해주세요.", HttpStatus.INTERNAL_SERVER_ERROR),
+    UNKNOWN_EXCEPTION("알 수 없는 예외", HttpStatus.INTERNAL_SERVER_ERROR);
     private final String message;
     private final HttpStatus status;
 
