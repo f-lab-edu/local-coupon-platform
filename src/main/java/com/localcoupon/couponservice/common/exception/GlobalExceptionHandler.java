@@ -7,9 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.sql.SQLException;
 import java.util.stream.Collectors;
@@ -31,13 +33,27 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(CommonErrorCode.BAD_REQUEST, detailMessage));
     }
 
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException e) {
+        return ResponseEntity
+                .status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body(ErrorResponse.of(CommonErrorCode.HTTP_METHOD_NOT_ALLOWED, e.getMessage()));
+    }
     // 엔티티 처리
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(ErrorResponse.of(CommonErrorCode.ENTITY_NOT_FOUND_ERROR));
+                .body(ErrorResponse.of(CommonErrorCode.ENTITY_NOT_FOUND_ERROR,e.getMessage()));
     }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> noResourceFoundException(NoResourceFoundException e) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(CommonErrorCode.NO_STATIC_RESOURCE_API, e.getMessage()));
+    }
+
 
     // 커스텀 예외(BaseException) 처리
     @ExceptionHandler(BaseException.class)
@@ -53,7 +69,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(CommonErrorCode.BAD_REQUEST));
+                .body(ErrorResponse.of(CommonErrorCode.BAD_REQUEST, e.getMessage()));
     }
     // DB 에러 처리
     @ExceptionHandler({ SQLException.class, DataAccessException.class })

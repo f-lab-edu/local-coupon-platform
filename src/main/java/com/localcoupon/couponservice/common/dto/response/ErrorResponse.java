@@ -1,11 +1,13 @@
 package com.localcoupon.couponservice.common.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.localcoupon.couponservice.common.exception.ErrorCode;
 import lombok.Getter;
 
 @Getter
 public class ErrorResponse extends BaseResponse {
     private final String errorCode;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private final String detailMessage;
 
     private ErrorResponse(ErrorCode errorCode, String detailMessage) {

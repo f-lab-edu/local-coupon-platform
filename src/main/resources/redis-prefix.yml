@@ -1,6 +1,6 @@
 localcoupon:
   redis:
-    session-ttl: 3600
+    session-ttl: 3600s
     session-prefix: "SESSION:"
     coupon-ready-prefix: "coupon:ready:"
     coupon-open-prefix: "coupon:open:"
