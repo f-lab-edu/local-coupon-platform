@@ -33,7 +33,7 @@ public class CouponPostProcessServiceImpl implements CouponPostProcessService {
             couponMailService.sendCouponEmail(dto.userEmail(), dto.couponTitle(), qrImageUrl);
 
             // 4. 발급 쿠폰 업데이트
-            issuedCouponRepository.save(issuedCoupon);
+            issuedCouponRepository.save(issuedCoupon.postProcess(qrToken, qrImageUrl));
 
             log.info("[CouponPostProcessService] 후처리 완료 issuedCouponId={}, userId={}", dto.issuedCouponId(), dto.userId());
         } catch (Exception e) {

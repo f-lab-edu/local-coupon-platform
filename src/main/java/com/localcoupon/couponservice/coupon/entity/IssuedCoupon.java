@@ -69,6 +69,15 @@ public class IssuedCoupon {
         return this;
     }
 
+    public IssuedCoupon postProcess (String qrToken, String qrImageUrl) {
+        if (this.isUsed) {
+            throw new UserCouponException(UserCouponErrorCode.ALREADY_COUPON_USED);
+        }
+        this.qrToken = qrToken;
+        this.qrImageUrl = qrImageUrl;
+        return this;
+    }
+
     public static IssuedCoupon of(User user, Coupon coupon, String qrToken,  String qrImageUrl, LocalDateTime issuedAt) {
         return new IssuedCoupon(user,coupon,issuedAt,null,qrToken,false, qrImageUrl);
     }
