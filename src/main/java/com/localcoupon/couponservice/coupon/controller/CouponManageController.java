@@ -1,6 +1,7 @@
 package com.localcoupon.couponservice.coupon.controller;
 
 import com.localcoupon.couponservice.auth.security.CustomUserDetails;
+import com.localcoupon.couponservice.common.annotation.CursorRequest;
 import com.localcoupon.couponservice.common.constants.ApiMapping;
 import com.localcoupon.couponservice.common.dto.request.CursorPageRequest;
 import com.localcoupon.couponservice.common.dto.response.SuccessResponse;
@@ -24,19 +25,19 @@ public class CouponManageController {
 
     private final CouponManageService couponManageService;
 
-    @PostMapping("/coupons")
-    public SuccessResponse<CouponResponseDto> createCoupon(@RequestBody CouponCreateRequestDto request, @AuthenticationPrincipal CustomUserDetails user) {
-        return SuccessResponse.of(couponManageService.createCoupon(request, user.getId()));
-    }
-
     @GetMapping("/coupons")
     public SuccessResponse<List<CouponResponseDto>> getCoupons(
             @AuthenticationPrincipal CustomUserDetails user,
-            @ModelAttribute CursorPageRequest request
+            @CursorRequest CursorPageRequest request
     ) {
         return SuccessResponse.of(
                 couponManageService.getCouponsByOwner(user.getId(), request)
         );
+    }
+
+    @PostMapping("/coupons")
+    public SuccessResponse<CouponResponseDto> createCoupon(@RequestBody CouponCreateRequestDto request, @AuthenticationPrincipal CustomUserDetails user) {
+        return SuccessResponse.of(couponManageService.createCoupon(request, user.getId()));
     }
 
     @GetMapping("/coupons/{couponId}")

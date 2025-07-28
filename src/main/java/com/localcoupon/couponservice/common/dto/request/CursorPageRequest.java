@@ -18,10 +18,10 @@ public record CursorPageRequest(
             String direction
     ) {
         return new CursorPageRequest(
-                cursor,
+                cursor == null ? 0L : cursor,
                 size == null ? DEFAULT_SIZE : size,
-                sortBy == null ? DEFAULT_SORT_BY : sortBy,
-                direction == null ? SortDirection.DESCENDING : SortDirection.valueOf(direction.toUpperCase())
+                sortBy.isEmpty() ? DEFAULT_SORT_BY : sortBy,
+                direction.isEmpty() ? SortDirection.DESCENDING : SortDirection.valueOf(direction.toUpperCase())
         );
     }
 }

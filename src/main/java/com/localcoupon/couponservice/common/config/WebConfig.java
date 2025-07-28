@@ -1,9 +1,11 @@
 package com.localcoupon.couponservice.common.config;
 
+import com.localcoupon.couponservice.common.aspect.CursorPageRequestResolver;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -26,4 +28,8 @@ public class WebConfig implements WebMvcConfigurer {
         }
     }
 
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new CursorPageRequestResolver());
+    }
 }
