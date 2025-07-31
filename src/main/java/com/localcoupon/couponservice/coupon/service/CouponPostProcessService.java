@@ -1,8 +1,8 @@
 package com.localcoupon.couponservice.coupon.service;
 
-import com.localcoupon.couponservice.coupon.dto.CouponPostProcessDto;
 import com.localcoupon.couponservice.coupon.entity.IssuedCoupon;
+import com.localcoupon.couponservice.user.entity.User;
 
 public interface CouponPostProcessService {
-    void sendQrCouponToUser(CouponPostProcessDto couponPostProcessDto, IssuedCoupon issuedCoupon);
+    void sendQrCouponToUser(User user, IssuedCoupon issuedCoupon);
 }

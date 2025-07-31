@@ -50,11 +50,29 @@ public class CouponRedissonServiceImpl implements CouponCacheService {
         String lockKey = redisProperties.couponLockPrefix() + couponId;
         String dataKey = redisProperties.couponOpenPrefix() + couponId;
 
+        if (isCouponOpen(couponId)) {
+            throw new UserCouponException(UserCouponErrorCode.ENDED_COUPON_ISSUE);
+        }
+
         return couponRedisRepository.executeWithLock(
                 lockKey,
                 2000,
                 5000,
                 () -> couponRedisRepository.decreaseCouponStock(dataKey)
+                        .orElseThrow(() -> new UserCouponException(UserCouponErrorCode.SOLD_OUT_COUPON))
+        );
+    }
+
+    @Override
+    public int increaseCouponStock(Long couponId) {
+        String lockKey = redisProperties.couponLockPrefix() + couponId;
+        String dataKey = redisProperties.couponOpenPrefix() + couponId;
+
+        return couponRedisRepository.executeWithLock(
+                lockKey,
+                2000,
+                5000,
+                () -> couponRedisRepository.increaseCouponStock(dataKey)
                         .orElseThrow(() -> new UserCouponException(UserCouponErrorCode.SOLD_OUT_COUPON))
         );
     }

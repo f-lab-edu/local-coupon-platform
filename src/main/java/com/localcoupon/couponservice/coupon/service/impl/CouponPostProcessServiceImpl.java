@@ -1,10 +1,10 @@
 package com.localcoupon.couponservice.coupon.service.impl;
 
-import com.localcoupon.couponservice.coupon.dto.CouponPostProcessDto;
 import com.localcoupon.couponservice.coupon.entity.IssuedCoupon;
 import com.localcoupon.couponservice.coupon.repository.IssuedCouponRepository;
 import com.localcoupon.couponservice.coupon.service.CouponPostProcessService;
 import com.localcoupon.couponservice.coupon.service.QrTokenService;
+import com.localcoupon.couponservice.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -19,26 +19,27 @@ public class CouponPostProcessServiceImpl implements CouponPostProcessService {
     private final IssuedCouponRepository issuedCouponRepository;
 
     @Async
-    public void sendQrCouponToUser(CouponPostProcessDto dto, IssuedCoupon issuedCoupon) {
+    public void sendQrCouponToUser(User user, IssuedCoupon issuedCoupon) {
         try {
             // 1. QR 토큰 생성
-            String qrToken = qrTokenService.generateQrToken(
-                    dto.issuedCouponId(), dto.issuedCouponValidStartTime(), dto.issuedCouponValidEndTime()
+            String qrToken = qrTokenService.generateQrToken(issuedCoupon.getId(),
+                    issuedCoupon.getCoupon().getCouponValidStartTime(),
+                    issuedCoupon.getCoupon().getCouponValidEndTime()
             );
 
             // 2. Cloudinary 업로드
             String qrImageUrl = qrTokenService.uploadQrImage(qrToken);
 
             // 3. 이메일 발송
-            couponMailService.sendCouponEmail(dto.userEmail(), dto.couponTitle(), qrImageUrl);
+            couponMailService.sendCouponEmail(user.getEmail(), issuedCoupon.getCoupon().getTitle(), qrImageUrl);
 
             // 4. 발급 쿠폰 업데이트
             issuedCouponRepository.save(issuedCoupon.postProcess(qrToken, qrImageUrl));
 
-            log.info("[CouponPostProcessService] 후처리 완료 issuedCouponId={}, userId={}", dto.issuedCouponId(), dto.userId());
+            log.info("[CouponPostProcessService] 후처리 완료 issuedCouponId={}, userId={}", issuedCoupon.getId(), user.getEmail());
         } catch (Exception e) {
             // TODO 실패 시 처리 방안
-            log.error("[CouponPostProcessService] 후처리 실패 issuedCouponId={}, userId={}", dto.issuedCouponId(), dto.userId(), e);
+            log.error("[CouponPostProcessService] 후처리 실패 issuedCouponId={}, userId={}", issuedCoupon.getId(), user.getEmail(), e);
         }
     }
 }

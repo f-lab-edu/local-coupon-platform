@@ -9,4 +9,6 @@ public interface CouponCacheService {
     boolean isCouponOpen(Long couponId);
 
     int decreaseCouponStock(Long couponId);
+
+    int increaseCouponStock(Long couponId);
 }
