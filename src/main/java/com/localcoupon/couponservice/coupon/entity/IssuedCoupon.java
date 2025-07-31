@@ -78,6 +78,10 @@ public class IssuedCoupon {
         return this;
     }
 
+    public static IssuedCoupon issueWithOutQrCode(User user, Coupon coupon, LocalDateTime issuedAt) {
+        return IssuedCoupon.of(user,coupon,issuedAt);
+    }
+
     public static IssuedCoupon of(User user, Coupon coupon, String qrToken,  String qrImageUrl, LocalDateTime issuedAt) {
         return new IssuedCoupon(user,coupon,issuedAt,null,qrToken,false, qrImageUrl);
     }
