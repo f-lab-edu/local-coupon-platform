@@ -79,50 +79,6 @@ services:
       - redis-net
     command: [ "redis-server", "--appendonly", "yes" ]
 
-  redis-slave:
-    image: redis:7.2
-    container_name: redis-slave
-    ports:
-      - "6380:6379"
-    networks:
-      - redis-net
-    depends_on:
-      - redis-master
-    command: [ "redis-server", "--slaveof", "redis-master", "--appendonly", "yes" ]
-
-  sentinel1:
-    image: redis:7.2
-    container_name: sentinel1
-    ports:
-      - "26379:26379"
-    networks:
-      - redis-net
-    command: [ "redis-sentinel", "/etc/redis/sentinel.conf" ]
-    volumes:
-      - ./sentinel.conf:/etc/redis/sentinel.conf
-
-  sentinel2:
-    image: redis:7.2
-    container_name: sentinel2
-    ports:
-      - "26380:26379"
-    networks:
-      - redis-net
-    command: [ "redis-sentinel", "/etc/redis/sentinel.conf" ]
-    volumes:
-      - ./sentinel.conf:/etc/redis/sentinel.conf
-
-  sentinel3:
-    image: redis:7.2
-    container_name: sentinel3
-    ports:
-      - "26381:26379"
-    networks:
-      - redis-net
-    command: [ "redis-sentinel", "/etc/redis/sentinel.conf" ]
-    volumes:
-      - ./sentinel.conf:/etc/redis/sentinel.conf
-
 volumes:
   mysql_data:
     external: true
@@ -133,6 +89,4 @@ volumes:
 
 networks:
   localnet:
-    driver: bridge
-  redis-net:
     driver: bridge

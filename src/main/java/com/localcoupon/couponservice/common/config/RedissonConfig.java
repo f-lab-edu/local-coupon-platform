@@ -13,15 +13,7 @@ public class RedissonConfig {
     public RedissonClient redissonClient() {
 
         Config config = new Config();
-        config.useSentinelServers()
-                .setMasterName("redis-master")  // Redis Sentinel에서 관리하는 마스터 이름
-                .addSentinelAddress(
-                        "redis://sentinel1:26379",  // Sentinel1 (Docker 컨테이너 명을 사용)
-                        "redis://sentinel2:26379",  // Sentinel2
-                        "redis://sentinel3:26379"   // Sentinel3
-                )
-                .setTimeout(3000)
-                .setCheckSentinelsList(false)
+        config.useSingleServer().setAddress("redis://localhost:6379")
                 .setConnectTimeout(3000);
         config.setCodec(new StringCodec()); // Byte에서 JSONJacksonCodec으로 변경
         return Redisson.create(config);
