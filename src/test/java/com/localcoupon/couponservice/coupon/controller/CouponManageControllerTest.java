@@ -1,23 +1,25 @@
 package com.localcoupon.couponservice.coupon.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.localcoupon.couponservice.auth.security.CustomUserDetails;
 import com.localcoupon.couponservice.common.TestSecurityConfig;
 import com.localcoupon.couponservice.common.constants.ApiMapping;
 import com.localcoupon.couponservice.common.dto.request.CursorPageRequest;
 import com.localcoupon.couponservice.common.enums.Result;
 import com.localcoupon.couponservice.common.external.kakao.dto.KakaoGeocodeInfoDto;
+import com.localcoupon.couponservice.common.interceptor.RateLimitInterceptor;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponVerifyRequestDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponVerifyResponseDto;
+import com.localcoupon.couponservice.coupon.dto.response.ListCouponResponseDto;
+import com.localcoupon.couponservice.coupon.entity.Coupon;
+import com.localcoupon.couponservice.coupon.entity.CouponPeriod;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.service.CouponManageService;
+import com.localcoupon.couponservice.store.dto.StoreResponseFields;
 import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
-import com.localcoupon.couponservice.store.dto.response.StoreResponseDto;
 import com.localcoupon.couponservice.store.entity.Store;
 import com.localcoupon.couponservice.store.enums.StoreCategory;
 import com.localcoupon.couponservice.user.enums.UserRole;
@@ -40,11 +42,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.localcoupon.couponservice.store.dto.StoreResponseFields.storeResponseFields;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -71,12 +73,15 @@ class CouponManageControllerTest {
     @MockitoBean
     private CouponManageService couponManageService;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @MockitoBean
+    private RateLimitInterceptor interceptor;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @BeforeEach
-    void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) throws IOException {
+        when(interceptor.preHandle(any(), any(), any())).thenReturn(true);
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .apply(springSecurity())
                 .apply(org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration(provider))
@@ -102,10 +107,10 @@ class CouponManageControllerTest {
                 "봄 시즌 한정 쿠폰입니다.",
                 CouponScope.NATIONAL,
                 100,
-                LocalDateTime.of(2025, 7, 1, 0, 0),
-                LocalDateTime.of(2025, 7, 2, 0, 0),
-                LocalDateTime.of(2025, 7, 1, 0, 0),
-                LocalDateTime.of(2025, 7, 2, 0, 0)
+                new CouponPeriod(LocalDateTime.of(2025, 7, 1, 0, 0),
+                        LocalDateTime.of(2025, 7, 2, 0, 0)),
+                new CouponPeriod(LocalDateTime.of(2025, 7, 1, 0, 0),
+                        LocalDateTime.of(2025, 7, 2, 0, 0))
         );
 
         StoreRequestDto request = new StoreRequestDto(
@@ -117,15 +122,6 @@ class CouponManageControllerTest {
                 "http://example.com/image.jpg"
         );
 
-        Store store = Store.from(
-                request,
-                new KakaoGeocodeInfoDto(
-                        "10010",
-                        new BigDecimal("36.2323"),
-                        new BigDecimal("126.3232")
-                ),
-                1L
-        );
 
         CouponResponseDto responseDto = new CouponResponseDto(
                 1L,
@@ -134,11 +130,10 @@ class CouponManageControllerTest {
                 CouponScope.NATIONAL,
                 100,
                 0,
-                LocalDateTime.of(2025, 7, 1, 0, 0),
-                LocalDateTime.of(2025, 7, 2, 0, 0),
-                LocalDateTime.of(2025, 7, 1, 0, 0),
-                LocalDateTime.of(2025, 7, 2, 0, 0),
-                StoreResponseDto.fromEntity(store)
+                new CouponPeriod(LocalDateTime.of(2025, 7, 1, 0, 0),
+                        LocalDateTime.of(2025, 7, 2, 0, 0)),
+                new CouponPeriod(LocalDateTime.of(2025, 7, 1, 0, 0),
+                        LocalDateTime.of(2025, 7, 2, 0, 0))
         );
 
         when(couponManageService.createCoupon(any(CouponCreateRequestDto.class), any(Long.class))).thenReturn(responseDto);
@@ -157,10 +152,10 @@ class CouponManageControllerTest {
                                 fieldWithPath("description").description("쿠폰 설명"),
                                 fieldWithPath("scope").description("쿠폰 범위 (LOCAL 또는 NATIONAL)"),
                                 fieldWithPath("totalCount").description("총 발급 가능 수량"),
-                                fieldWithPath("couponValidStartTime").description("쿠폰 유효 시작일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("couponValidEndTime").description("쿠폰 유효 종료일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("couponIssueStartTime").description("쿠폰 발급 시작일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("couponIssueEndTime").description("쿠폰 발급 종료일 (yyyy-MM-ddTHH:mm:ss)")
+                                fieldWithPath("validPeriod.start").description("쿠폰 유효 시작일"),
+                                fieldWithPath("validPeriod.end").description("쿠폰 유효 종료일"),
+                                fieldWithPath("issuePeriod.start").description("쿠폰 발급 시작일"),
+                                fieldWithPath("issuePeriod.end").description("쿠폰 발급 종료일")
                         ),
                         responseFields(
                                 fieldWithPath("success").description("요청 성공 여부"),
@@ -172,11 +167,11 @@ class CouponManageControllerTest {
                                 fieldWithPath("data.scope").description("쿠폰 범위 (LOCAL 또는 NATIONAL)"),
                                 fieldWithPath("data.totalCount").description("총 발급 가능 수량"),
                                 fieldWithPath("data.issuedCount").description("현재까지 발급된 수량"),
-                                fieldWithPath("data.couponValidStartTime").description("쿠폰 유효 시작일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("data.couponValidEndTime").description("쿠폰 유효 종료일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("data.couponIssueStartTime").description("쿠폰 유효 시작일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("data.couponIssueEndTime").description("쿠폰 유효 종료일 (yyyy-MM-ddTHH:mm:ss)")
-                        ).and(storeResponseFields("data.storeResponse."))
+                                fieldWithPath("data.validPeriod.start").description("쿠폰 유효 시작일"),
+                                fieldWithPath("data.validPeriod.end").description("쿠폰 유효 종료일"),
+                                fieldWithPath("data.issuePeriod.start").description("쿠폰 발급 시작일"),
+                                fieldWithPath("data.issuePeriod.end").description("쿠폰 발급 종료일")
+                        )
                 ));
     }
     @Test
@@ -203,22 +198,20 @@ class CouponManageControllerTest {
                 ),
                 1L
         );
-
-        CouponResponseDto responseDto = new CouponResponseDto(
-                1L,
+        CouponCreateRequestDto requestDto = new CouponCreateRequestDto(
                 "봄맞이 할인",
                 "봄 시즌 한정 쿠폰입니다.",
                 CouponScope.NATIONAL,
                 100,
-                0,
-                LocalDateTime.of(2025, 7, 1, 0, 0),
-                LocalDateTime.of(2025, 7, 2, 0, 0),
-                LocalDateTime.of(2025, 7, 1, 0, 0),
-                LocalDateTime.of(2025, 7, 2, 0, 0),
-                StoreResponseDto.fromEntity(store)
+                new CouponPeriod(LocalDateTime.of(2025, 7, 1, 0, 0),
+                        LocalDateTime.of(2025, 7, 2, 0, 0)),
+                new CouponPeriod(LocalDateTime.of(2025, 7, 1, 0, 0),
+                        LocalDateTime.of(2025, 7, 2, 0, 0))
         );
 
-        when(couponManageService.getCouponsByOwner(any(Long.class), any(CursorPageRequest.class))).thenReturn(List.of(responseDto));
+        ListCouponResponseDto responseDto = ListCouponResponseDto.from(List.of(Coupon.from(requestDto, store)));
+
+        when(couponManageService.getCouponsByOwner(any(Long.class), any(CursorPageRequest.class))).thenReturn(responseDto);
 
 
         mockMvc.perform(get(ApiMapping.COUPON_MANAGE_BASE + "/coupons")
@@ -240,17 +233,17 @@ class CouponManageControllerTest {
                                 fieldWithPath("success").description("요청 성공 여부"),
                                 fieldWithPath("message").description("응답 메시지"),
                                 fieldWithPath("httpStatus").description("HTTP 상태 코드"),
-                                fieldWithPath("data[].id").description("쿠폰 ID"),
-                                fieldWithPath("data[].title").description("쿠폰 제목"),
-                                fieldWithPath("data[].description").description("쿠폰 설명"),
-                                fieldWithPath("data[].scope").description("쿠폰 범위 (LOCAL 또는 NATIONAL)"),
-                                fieldWithPath("data[].totalCount").description("총 발급 가능 수량"),
-                                fieldWithPath("data[].issuedCount").description("현재까지 발급된 수량"),
-                                fieldWithPath("data[].couponValidStartTime").description("쿠폰 유효 시작일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("data[].couponValidEndTime").description("쿠폰 유효 종료일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("data[].couponIssueStartTime").description("쿠폰 유효 시작일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("data[].couponIssueEndTime").description("쿠폰 유효 종료일 (yyyy-MM-ddTHH:mm:ss)")
-                        ).and(storeResponseFields("data[].storeResponse."))
+                                fieldWithPath("data.couponResponseDtos[].id").description("쿠폰 ID"),
+                                fieldWithPath("data.couponResponseDtos[].title").description("쿠폰 제목"),
+                                fieldWithPath("data.couponResponseDtos[].description").description("쿠폰 설명"),
+                                fieldWithPath("data.couponResponseDtos[].scope").description("쿠폰 범위"),
+                                fieldWithPath("data.couponResponseDtos[].totalCount").description("총 발급 가능 수량"),
+                                fieldWithPath("data.couponResponseDtos[].issuedCount").description("현재까지 발급된 수량"),
+                                fieldWithPath("data.couponResponseDtos[].validPeriod.start").description("쿠폰 유효 시작일"),
+                                fieldWithPath("data.couponResponseDtos[].validPeriod.end").description("쿠폰 유효 종료일"),
+                                fieldWithPath("data.couponResponseDtos[].issuePeriod.start").description("쿠폰 발급 시작일"),
+                                fieldWithPath("data.couponResponseDtos[].issuePeriod.end").description("쿠폰 발급 종료일")
+                        ).and(StoreResponseFields.storeResponseFields("data.storeResponse."))
                 ));
     }
 
@@ -281,11 +274,10 @@ class CouponManageControllerTest {
         CouponResponseDto responseDto = new CouponResponseDto(
                 couponId, "봄맞이 할인", "봄 시즌 한정 쿠폰입니다.",
                 CouponScope.NATIONAL, 100, 0,
-                LocalDateTime.of(2025, 7, 1, 0, 0),
-                LocalDateTime.of(2025, 7, 2, 0, 0),
-                LocalDateTime.of(2025, 7, 1, 0, 0),
-                LocalDateTime.of(2025, 7, 2, 0, 0),
-                StoreResponseDto.fromEntity(store)
+                new CouponPeriod(LocalDateTime.of(2025, 7, 1, 0, 0),
+                        LocalDateTime.of(2025, 7, 2, 0, 0)),
+                new CouponPeriod(LocalDateTime.of(2025, 7, 1, 0, 0),
+                        LocalDateTime.of(2025, 7, 2, 0, 0))
         );
         when(couponManageService.getCouponDetail(couponId)).thenReturn(responseDto);
 
@@ -300,20 +292,20 @@ class CouponManageControllerTest {
                                 fieldWithPath("message").description("응답 메시지"),
                                 fieldWithPath("httpStatus").description("HTTP 상태 코드"),
                                 fieldWithPath("data.id").description("쿠폰 ID"),
-                                fieldWithPath("data.title").description("쿠폰 제목"),
-                                fieldWithPath("data.description").description("쿠폰 설명"),
-                                fieldWithPath("data.scope").description("쿠폰 범위"),
-                                fieldWithPath("data.totalCount").description("총 발급 가능 수량"),
-                                fieldWithPath("data.issuedCount").description("현재까지 발급된 수량"),
-                                fieldWithPath("data.couponValidStartTime").description("쿠폰 유효 시작일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("data.couponValidEndTime").description("쿠폰 유효 종료일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("data.couponIssueStartTime").description("쿠폰 유효 시작일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("data.couponIssueEndTime").description("쿠폰 유효 종료일 (yyyy-MM-ddTHH:mm:ss)")
-                        ).and(storeResponseFields("data.storeResponse."))
+                                fieldWithPath("data..title").description("쿠폰 제목"),
+                                fieldWithPath("data..description").description("쿠폰 설명"),
+                                fieldWithPath("data..scope").description("쿠폰 범위 (LOCAL 또는 NATIONAL)"),
+                                fieldWithPath("data..totalCount").description("총 발급 가능 수량"),
+                                fieldWithPath("data..issuedCount").description("현재까지 발급된 수량"),
+                                fieldWithPath("data..validPeriod.start").description("쿠폰 유효 시작일"),
+                                fieldWithPath("data..validPeriod.end").description("쿠폰 유효 종료일"),
+                                fieldWithPath("data..issuePeriod.start").description("쿠폰 발급 시작일"),
+                                fieldWithPath("data..issuePeriod.end").description("쿠폰 발급 종료일")
+                        )
                 ));
     }
     @Test
-    @DisplayName("쿠폰 수정 200")
+    @DisplayName("쿠폰의 이름과 기간을 수정한다.")
     void updateCoupon() throws Exception {
         StoreRequestDto request = new StoreRequestDto(
                 "스타벅스",
@@ -334,21 +326,24 @@ class CouponManageControllerTest {
                 1L
         );
         Long couponId = 1L;
-        CouponUpdateRequestDto requestDto = new CouponUpdateRequestDto("봄맞이 업데이트", "쿠폰 설명 수정", null, null,null,null,null,null);
+        CouponUpdateRequestDto requestDto = new CouponUpdateRequestDto("봄맞이 업데이트", "쿠폰 설명 수정", null, null,
+                new CouponPeriod(LocalDateTime.of(2025, 7, 1, 0, 0),
+                        LocalDateTime.of(2025, 7, 2, 0, 0)),
+                new CouponPeriod(LocalDateTime.of(2025, 7, 1, 0, 0),
+                        LocalDateTime.of(2025, 7, 2, 0, 0)));
 
         CouponResponseDto responseDto = new CouponResponseDto(
                 couponId, "봄맞이 업데이트", "쿠폰 설명 수정",
                 CouponScope.NATIONAL, 100, 0,
-                LocalDateTime.of(2025, 7, 1, 0, 0),
-                LocalDateTime.of(2025, 7, 2, 0, 0),
-                LocalDateTime.of(2025, 7, 1, 0, 0),
-                LocalDateTime.of(2025, 7, 2, 0, 0),
-                StoreResponseDto.fromEntity(store)
+                new CouponPeriod(LocalDateTime.of(2025, 7, 1, 0, 0),
+                        LocalDateTime.of(2025, 7, 2, 0, 0)),
+                new CouponPeriod(LocalDateTime.of(2025, 7, 1, 0, 0),
+                        LocalDateTime.of(2025, 7, 2, 0, 0))
         );
 
 
 
-        when(couponManageService.updateCoupon(eq(couponId), any(Long.class), eq(requestDto))).thenReturn(responseDto);
+        when(couponManageService.updateCoupon(eq(couponId), any(Long.class), any(CouponUpdateRequestDto.class))).thenReturn(responseDto);
 
         String json = objectMapper.writeValueAsString(requestDto);
 
@@ -364,10 +359,10 @@ class CouponManageControllerTest {
                                 fieldWithPath("description").description("쿠폰 설명"),
                                 fieldWithPath("totalCount").description("총 발급 가능 수량"),
                                 fieldWithPath("scope").description("쿠폰 범위"),
-                                fieldWithPath("couponValidStartTime").description("쿠폰 유효 시작일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("couponValidEndTime").description("쿠폰 유효 종료일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("couponIssueStartTime").description("쿠폰 유효 시작일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("couponIssueEndTime").description("쿠폰 유효 종료일 (yyyy-MM-ddTHH:mm:ss)")
+                                fieldWithPath("validPeriod.start").description("쿠폰 유효 시작일"),
+                                fieldWithPath("validPeriod.end").description("쿠폰 유효 종료일"),
+                                fieldWithPath("issuePeriod.start").description("쿠폰 발급 시작일"),
+                                fieldWithPath("issuePeriod.end").description("쿠폰 발급 종료일")
                         ),
                         responseFields(
                                 fieldWithPath("success").description("요청 성공 여부"),
@@ -379,16 +374,16 @@ class CouponManageControllerTest {
                                 fieldWithPath("data.scope").description("쿠폰 범위"),
                                 fieldWithPath("data.totalCount").description("총 발급 가능 수량"),
                                 fieldWithPath("data.issuedCount").description("현재까지 발급된 수량"),
-                                fieldWithPath("data.couponValidStartTime").description("쿠폰 유효 시작일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("data.couponValidEndTime").description("쿠폰 유효 종료일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("data.couponIssueStartTime").description("쿠폰 유효 시작일 (yyyy-MM-ddTHH:mm:ss)"),
-                                fieldWithPath("data.couponIssueEndTime").description("쿠폰 유효 종료일 (yyyy-MM-ddTHH:mm:ss)")
-                        ).and(storeResponseFields("data.storeResponse."))
+                                fieldWithPath("data.validPeriod.start").description("쿠폰 유효 시작일"),
+                                fieldWithPath("data.validPeriod.end").description("쿠폰 유효 종료일"),
+                                fieldWithPath("data.issuePeriod.start").description("쿠폰 발급 시작일"),
+                                fieldWithPath("data.issuePeriod.end").description("쿠폰 발급 종료일")
+                        )
                 ));
     }
 
     @Test
-    @DisplayName("쿠폰 삭제 200")
+    @DisplayName("쿠폰을 삭제처리한다.")
     void deleteCoupon() throws Exception {
         Long couponId = 1L;
         when(couponManageService.deleteCoupon(couponId, 1L)).thenReturn((Result.SUCCESS));

@@ -6,6 +6,7 @@ import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponVerifyResponseDto;
+import com.localcoupon.couponservice.coupon.dto.response.ListCouponResponseDto;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.entity.IssuedCoupon;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
@@ -46,11 +47,9 @@ public class CouponManageServiceImpl implements CouponManageService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CouponResponseDto> getCouponsByOwner(Long ownerId, CursorPageRequest request) {
+    public ListCouponResponseDto getCouponsByOwner(Long ownerId, CursorPageRequest request) {
         List<Coupon> coupons = couponRepository.findAllByOwnerIdWithCursorPaging(ownerId, request);
-        return coupons.stream()
-                .map(CouponResponseDto::from)
-                .toList();
+        return ListCouponResponseDto.from(coupons);
     }
 
     @Override

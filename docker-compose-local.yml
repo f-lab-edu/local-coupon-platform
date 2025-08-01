@@ -1,6 +1,11 @@
 version: "3.8"
 
 services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
   mysql-exporter:
     image: prom/mysqld-exporter
     container_name: mysql-exporter
@@ -69,15 +74,15 @@ services:
     networks:
       - localnet
 
-  redis:
-    image: redis:8.0.2
-    container_name: myredis
+  # Redis Master
+  redis-master:
+    image: redis:7.2
+    container_name: redis-master
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
     networks:
       - localnet
+    command: [ "redis-server", "--appendonly", "yes" ]
 
 volumes:
   mysql_data:
@@ -90,5 +95,3 @@ volumes:
 networks:
   localnet:
     driver: bridge
-
-

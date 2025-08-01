@@ -34,7 +34,7 @@
 //    private CouponRedisRepository redisCouponRepository;
 //
 //    @InjectMocks
-//    private CouponRedissonServiceImpl couponCacheService;
+//    private CouponRedissonServiceImpl CouponIssueService;
 //
 //    private final Long couponId = 1L;
 //    private final String redisKey = COUPON_OPEN_PREFIX + couponId;
@@ -56,7 +56,7 @@
 //                .thenReturn(Optional.of(coupon.getTotalCount()));
 //
 //        // when
-//        Coupon savedCoupon = couponCacheService.saveCouponForOpen(coupon);
+//        Coupon savedCoupon = CouponIssueService.saveCouponForOpen(coupon);
 //
 //        // then
 //        assertThat(savedCoupon).isNotNull();
@@ -75,7 +75,7 @@
 //        when(redisCouponRepository.exists(redisKey)).thenReturn(true);
 //
 //        // when
-//        boolean result = couponCacheService.isCouponOpen(couponId);
+//        boolean result = CouponIssueService.isCouponOpen(couponId);
 //
 //        // then
 //        assertThat(result).isTrue();
@@ -88,7 +88,7 @@
 //        when(redisCouponRepository.exists(redisKey)).thenReturn(false);
 //
 //        // when
-//        boolean result = couponCacheService.isCouponOpen(couponId);
+//        boolean result = CouponIssueService.isCouponOpen(couponId);
 //
 //        // then
 //        assertThat(result).isFalse();
@@ -107,7 +107,7 @@
 //
 //        // when & then
 //        assertThrows(UserCouponException.class,
-//                () -> couponCacheService.decreaseCouponStock(couponId));
+//                () -> CouponIssueService.decreaseCouponStock(couponId));
 //    }
 //
 //    @Test
@@ -122,7 +122,7 @@
 //        )).thenReturn(9);
 //
 //        // when
-//        int newStock = couponCacheService.decreaseCouponStock(couponId);
+//        int newStock = CouponIssueService.decreaseCouponStock(couponId);
 //
 //        // then
 //        assertThat(newStock).isEqualTo(9);

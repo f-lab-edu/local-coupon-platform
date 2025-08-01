@@ -3,6 +3,7 @@ package com.localcoupon.couponservice.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.localcoupon.couponservice.auth.service.AuthService;
 import com.localcoupon.couponservice.common.TestSecurityConfig;
+import com.localcoupon.couponservice.common.interceptor.RateLimitInterceptor;
 import com.localcoupon.couponservice.user.dto.request.SignUpRequestDto;
 import com.localcoupon.couponservice.user.dto.response.UserResponseDto;
 import com.localcoupon.couponservice.user.service.UserService;
@@ -21,6 +22,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.io.IOException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -41,6 +44,9 @@ class UserControllerTest {
     private UserService userService;
     @MockitoBean
     private AuthService authService;
+    @MockitoBean
+    private RateLimitInterceptor rateLimitInterceptor;
+
 
     @Autowired
     private MockMvc mockMvc;
@@ -48,7 +54,8 @@ class UserControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
+    void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) throws IOException {
+        when(rateLimitInterceptor.preHandle(any(), any(), any())).thenReturn(true);
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .apply(springSecurity())
                 .apply(org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration(provider))

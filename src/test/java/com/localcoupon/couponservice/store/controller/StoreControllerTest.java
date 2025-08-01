@@ -2,6 +2,7 @@ package com.localcoupon.couponservice.store.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.localcoupon.couponservice.common.TestSecurityConfig;
+import com.localcoupon.couponservice.common.interceptor.RateLimitInterceptor;
 import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
 import com.localcoupon.couponservice.store.dto.request.UserStoreSearchRequestDto;
 import com.localcoupon.couponservice.store.dto.response.StoreResponseDto;
@@ -23,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,16 +43,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(RestDocumentationExtension.class)
 @Import(TestSecurityConfig.class)
 @WebMvcTest(controllers = StoreController.class)
-class StoreControllerTest { ;
+class StoreControllerTest {
 
     @MockitoBean
     private StoreService storeService;
+    @MockitoBean
+    private RateLimitInterceptor rateLimitInterceptor;
     @Autowired
     private MockMvc mockMvc;
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    void setUp(RestDocumentationContextProvider provider, WebApplicationContext context) {
+    void setUp(RestDocumentationContextProvider provider, WebApplicationContext context) throws IOException {
+        when(rateLimitInterceptor.preHandle(any(), any(), any())).thenReturn(true);
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
                 .apply(springSecurity())
                 .apply(org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration(provider))

@@ -9,17 +9,13 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RedissonConfig {
-
     @Bean
     public RedissonClient redissonClient() {
-        Config config = new Config();
-        config.setCodec(new StringCodec()); // Byte에서 JSONJacksonCodec으로 변경
-        config.useSingleServer()
-                .setAddress("redis://127.0.0.1:6379")
-                .setConnectionPoolSize(2) //Netty의 Nonblocking I/O 커넥션 하나로 큐에 담아 처리
-                .setConnectionMinimumIdleSize(2)
-                .setTimeout(3000);
 
+        Config config = new Config();
+        config.useSingleServer().setAddress("redis://localhost:6379")
+                .setConnectTimeout(3000);
+        config.setCodec(new StringCodec()); // Byte에서 JSONJacksonCodec으로 변경
         return Redisson.create(config);
     }
 }

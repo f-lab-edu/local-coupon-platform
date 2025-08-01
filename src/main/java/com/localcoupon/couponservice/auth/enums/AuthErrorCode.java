@@ -7,7 +7,9 @@ public enum AuthErrorCode implements ErrorCode {
     PASSWORD_NOT_MATCHING("비밀번호가 틀렸습니다.", HttpStatus.BAD_REQUEST),
     SESSION_NOT_EXISTS("세션이 없습니다.", HttpStatus.BAD_REQUEST),
     UNAUTHORIZED("인증에 실패하였습니다.", HttpStatus.UNAUTHORIZED),
-    FORBIDDEN("권한이 없습니다.", HttpStatus.FORBIDDEN);
+    FORBIDDEN("권한이 없습니다.", HttpStatus.FORBIDDEN),
+    DEVICE_INFO_NOT_EXIST("디바이스 정보가 없습니다.", HttpStatus.FORBIDDEN),
+    RATE_LIMIT_EXCEEDED("과도한 요청을 방지합니다.", HttpStatus.TOO_MANY_REQUESTS);
 
     private final String message;
     private final HttpStatus status;

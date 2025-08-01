@@ -5,6 +5,7 @@ import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponVerifyResponseDto;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
+import com.localcoupon.couponservice.coupon.entity.CouponPeriod;
 import com.localcoupon.couponservice.coupon.entity.IssuedCoupon;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
@@ -54,17 +55,15 @@ class CouponManageServiceImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
 
-        // Create Coupon DTO
         createRequest = new CouponCreateRequestDto("쿠폰1", "설명1", CouponScope.LOCAL, 100,
-                LocalDateTime.now(), LocalDateTime.now().plusDays(30),
-                LocalDateTime.now(), LocalDateTime.now().plusDays(7));
+                new CouponPeriod(LocalDateTime.now(), LocalDateTime.now().plusDays(30)),
+                new CouponPeriod(LocalDateTime.now(), LocalDateTime.now().plusDays(7)));
 
-        // Update Coupon DTO
         updateRequest = new CouponUpdateRequestDto("수정된 쿠폰", "수정된 설명", CouponScope.NATIONAL, 50,
-                LocalDateTime.now(), LocalDateTime.now().plusDays(60),
-                LocalDateTime.now(), LocalDateTime.now().plusDays(10));
+                new CouponPeriod(LocalDateTime.now(), LocalDateTime.now().plusDays(60)),
+                new CouponPeriod(LocalDateTime.now(), LocalDateTime.now().plusDays(10)));
 
-        // Sample IssuedCoupon for testing
+
         issuedCoupon = IssuedCoupon.builder()
                 .qrToken("validQrToken")
                 .isUsed(false)

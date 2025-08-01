@@ -125,4 +125,20 @@ public class CouponRedisRepository {
         }
     }
 
+    public Optional<Integer> increaseCouponStock(String key) {
+        try {
+            RBucket<String> bucket = redissonClient.getBucket(key);
+
+            return Optional.ofNullable(bucket.get())
+                    .map(Integer::parseInt)
+                    .map(stock -> {
+                        bucket.set(String.valueOf(stock + 1));
+                        return stock + 1;
+                    });
+        } catch (Exception e) {
+            log.error("[Redis] increaseCouponStock failed. key={}", key, e);
+            throw new CommonException(CommonErrorCode.REDIS_OPERATION_ERROR);
+        }
+    }
+
 }

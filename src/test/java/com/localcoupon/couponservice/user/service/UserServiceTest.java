@@ -4,7 +4,7 @@ import com.localcoupon.couponservice.common.util.PasswordEncoder;
 import com.localcoupon.couponservice.user.dto.request.SignUpRequestDto;
 import com.localcoupon.couponservice.user.dto.response.UserResponseDto;
 import com.localcoupon.couponservice.user.entity.User;
-import com.localcoupon.couponservice.user.exception.UserAlreadyExistsException;
+import com.localcoupon.couponservice.user.exception.UserExcpetion;
 import com.localcoupon.couponservice.user.exception.UserNotFoundException;
 import com.localcoupon.couponservice.user.repository.UserRepository;
 import com.localcoupon.couponservice.user.service.impl.UserServiceImpl;
@@ -62,7 +62,7 @@ class UserServiceTest {
         when(userRepository.existsByEmail(dto.email())).thenReturn(true);
 
         assertThatThrownBy(() -> userService.signUpUser(dto))
-                .isInstanceOf(UserAlreadyExistsException.class);
+                .isInstanceOf(UserExcpetion.class);
     }
 
     @Test

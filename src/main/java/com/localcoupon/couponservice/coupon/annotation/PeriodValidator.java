@@ -13,8 +13,8 @@ public class PeriodValidator implements ConstraintValidator<ValidPeriod, CouponP
         if(CouponPeriod == null) {
             return false;
         }
-        LocalDateTime start = CouponPeriod.start();
-        LocalDateTime end = CouponPeriod.end();
+        LocalDateTime start = CouponPeriod.getStart();
+        LocalDateTime end = CouponPeriod.getEnd();
 
         if (start == null || end == null) return false;
         if (end.isBefore(start)) return false;

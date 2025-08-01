@@ -3,18 +3,23 @@ package com.localcoupon.couponservice.coupon.service;
 import com.localcoupon.couponservice.common.external.kakao.dto.KakaoGeocodeInfoDto;
 import com.localcoupon.couponservice.common.infra.RedisProperties;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
+import com.localcoupon.couponservice.coupon.entity.CouponPeriod;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
 import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
 import com.localcoupon.couponservice.store.entity.Store;
 import com.localcoupon.couponservice.store.enums.StoreCategory;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -25,23 +30,32 @@ import java.util.concurrent.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
+@ActiveProfiles("local")
+@EnableConfigurationProperties(RedisProperties.class)
 class CouponRedissonServiceIntegrationTest {
 
     @Autowired
-    @Qualifier("couponRedissonServiceImpl")
-    private CouponCacheService couponRedissonServiceImpl;
+    @Qualifier("couponIssueServiceImpl")
+    private CouponIssueService couponRedissonServiceImpl;
 
     @Autowired
     private RedissonClient redissonClient;
 
+    @MockitoBean
+    private RedisProperties redisProperties;
     private final Long couponId = 1L;
 
-    @Autowired
-    private RedisProperties redisProperties;
-    private final String redisKey = redisProperties.couponOpenPrefix() + couponId;
+    private String redisKey;
 
+
+    @BeforeEach
+    void setUp() {
+        when(redisProperties.couponOpenPrefix()).thenReturn("coupon:open:");
+        redisKey = redisProperties.couponOpenPrefix()  + couponId;
+    }
     @AfterEach
     void tearDown() {
         // 테스트 끝나면 Redis 비우기
@@ -62,7 +76,7 @@ class CouponRedissonServiceIntegrationTest {
         assertThat(savedCoupon).isNotNull();
         assertThat(savedCoupon.getId()).isEqualTo(couponId);
 
-        Integer savedStock = (Integer) redissonClient.getBucket(redisKey).get();
+        Integer savedStock = Integer.parseInt((String) redissonClient.getBucket(redisKey).get());
         assertThat(savedStock).isEqualTo(coupon.getTotalCount());
     }
 
@@ -145,11 +159,9 @@ class CouponRedissonServiceIntegrationTest {
                 "Coupon description",
                 10,
                 0,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusDays(7),
-                LocalDateTime.now(),
-                LocalDateTime.now().plusDays(7),
-                (Store.from(request,geoCodeInfo, 1L))
+                new CouponPeriod(LocalDateTime.now(), LocalDateTime.now().plusDays(7)),
+                new CouponPeriod(LocalDateTime.now(), LocalDateTime.now().plusDays(7)),
+                Store.from(request,geoCodeInfo, 1L)
         );
     }
 

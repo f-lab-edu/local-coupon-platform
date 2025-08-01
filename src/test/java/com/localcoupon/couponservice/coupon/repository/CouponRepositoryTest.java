@@ -3,6 +3,7 @@ package com.localcoupon.couponservice.coupon.repository;
 import com.localcoupon.couponservice.common.dto.request.CursorPageRequest;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
+import com.localcoupon.couponservice.coupon.entity.CouponPeriod;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.store.entity.Store;
 import com.localcoupon.couponservice.store.enums.StoreCategory;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -22,10 +24,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
+@ActiveProfiles("local")
 public class CouponRepositoryTest {
 
     @Autowired
     private CouponRepository couponRepository;
+
+    @Autowired
+    private IssuedCouponRepository issuedCouponRepository;
 
     @Autowired
     private StoreRepository storeRepository;
@@ -34,10 +40,13 @@ public class CouponRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        // Store 데이터 준비
         // 기존 데이터 삭제
-        couponRepository.deleteAll(); // 이전에 저장된 쿠폰 데이터를 모두 삭제
-        storeRepository.deleteAll();  // 기존 매장 데이터 삭제
+        issuedCouponRepository.deleteAllInBatch();
+        issuedCouponRepository.flush();
+        couponRepository.deleteAllInBatch();
+        couponRepository.flush();
+        storeRepository.deleteAllInBatch();
+        storeRepository.flush();
 
         store = Store.builder()
                 .ownerId(1L)  // Owner ID 설정
@@ -54,12 +63,12 @@ public class CouponRepositoryTest {
 
         // Coupon 데이터 준비
         CouponCreateRequestDto createRequest = new CouponCreateRequestDto("쿠폰1", "설명1", CouponScope.LOCAL, 100,
-                LocalDateTime.now(), LocalDateTime.now().plusDays(30),
-                LocalDateTime.now(), LocalDateTime.now().plusDays(7));
+                new CouponPeriod(LocalDateTime.now(), LocalDateTime.now().plusDays(30)),
+                new CouponPeriod(LocalDateTime.now(), LocalDateTime.now().plusDays(7)));
 
         CouponCreateRequestDto createRequest2 = new CouponCreateRequestDto("쿠폰2", "설명2", CouponScope.LOCAL, 200,
-                LocalDateTime.now(), LocalDateTime.now().plusDays(25),
-                LocalDateTime.now(), LocalDateTime.now().plusDays(30));
+                new CouponPeriod(LocalDateTime.now(), LocalDateTime.now().plusDays(30)),
+                new CouponPeriod(LocalDateTime.now(), LocalDateTime.now().plusDays(7)));
 
         // Coupon 객체를 DTO에서 변환하여 생성
         Coupon coupon1 = Coupon.from(createRequest, store);  // of() 메서드를 사용하여 Coupon 객체 생성

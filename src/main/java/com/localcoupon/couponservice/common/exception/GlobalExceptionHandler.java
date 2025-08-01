@@ -5,30 +5,35 @@ import com.localcoupon.couponservice.common.enums.CommonErrorCode;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.sql.SQLException;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(
+            Exception ex, Object body, HttpHeaders headers,
+            HttpStatusCode status, WebRequest request) {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e) {
-        String detailMessage = e.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(error -> String.format("[%s] %s", error.getField(), error.getDefaultMessage()))
-                .collect(Collectors.joining(" | "));
+        CommonErrorCode errorCode;
+
+        if (status.is4xxClientError()) {
+            errorCode = CommonErrorCode.BAD_REQUEST;
+        } else if (status.is5xxServerError()) {
+            errorCode = CommonErrorCode.SERVER_ERROR;
+        } else {
+            errorCode = CommonErrorCode.UNKNOWN_EXCEPTION;
+        }
 
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(CommonErrorCode.BAD_REQUEST, detailMessage));
+                .status(status)
+                .body(ErrorResponse.of(errorCode, ex.getMessage()));
     }
 
     // 엔티티 처리
@@ -36,8 +41,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(ErrorResponse.of(CommonErrorCode.ENTITY_NOT_FOUND_ERROR));
+                .body(ErrorResponse.of(CommonErrorCode.ENTITY_NOT_FOUND_ERROR,e.getMessage()));
     }
+
 
     // 커스텀 예외(BaseException) 처리
     @ExceptionHandler(BaseException.class)
@@ -53,7 +59,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of(CommonErrorCode.BAD_REQUEST));
+                .body(ErrorResponse.of(CommonErrorCode.BAD_REQUEST, e.getMessage()));
     }
     // DB 에러 처리
     @ExceptionHandler({ SQLException.class, DataAccessException.class })
