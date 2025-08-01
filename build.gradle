@@ -1,5 +1,6 @@
 plugins {
 	id 'java'
+	id 'jacoco'
 	id 'org.springframework.boot' version '3.5.0'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'org.asciidoctor.jvm.convert' version '3.3.2'
@@ -12,6 +13,10 @@ java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(17)
 	}
+}
+
+jacoco {
+	toolVersion = "0.8.10" // 최신 버전 확인
 }
 
 configurations {
@@ -95,6 +100,17 @@ ext {
 tasks.named('test') {
 	useJUnitPlatform()
 	outputs.dir snippetsDir
+	finalizedBy jacocoTestReport // 테스트 끝나면 리포트 생성
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required.set(true)
+		csv.required.set(false)
+		html.required.set(true) // HTML 보고서 생성
+		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+	}
 }
 
 

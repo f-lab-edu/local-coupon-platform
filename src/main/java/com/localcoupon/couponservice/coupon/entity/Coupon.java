@@ -11,7 +11,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.annotations.Where;
 import org.hibernate.validator.constraints.Length;
 
 @Entity
@@ -19,7 +18,6 @@ import org.hibernate.validator.constraints.Length;
 @Table(name = "coupon")
 @Builder
 @AllArgsConstructor
-@Where(clause = "is_deleted = false")
 public class Coupon extends BaseEntity {
 
     @Id
@@ -117,11 +115,11 @@ public class Coupon extends BaseEntity {
         if (request.totalCount() != null) {
             this.totalCount = request.totalCount();
         }
-        if (request.couponValidStartTime() != null && request.couponValidEndTime() != null) {
-            this.validPeriod = new CouponPeriod(request.couponValidStartTime(), request.couponValidEndTime());
+        if (request.validPeriod() != null && request.validPeriod().getStart() != null && request.validPeriod().getEnd() != null) {
+            this.validPeriod = new CouponPeriod(request.validPeriod().getStart(), request.validPeriod().getEnd());
         }
-        if (request.couponIssueStartTime() != null && request.couponIssueEndTime() != null) {
-            this.issuePeriod = new CouponPeriod(request.couponIssueStartTime(), request.couponIssueEndTime());
+        if (request.issuePeriod() != null && request.issuePeriod().getStart() != null && request.issuePeriod().getEnd() != null) {
+            this.issuePeriod = new CouponPeriod(request.issuePeriod().getStart(), request.issuePeriod().getEnd());
         }
         return Result.SUCCESS;
     }

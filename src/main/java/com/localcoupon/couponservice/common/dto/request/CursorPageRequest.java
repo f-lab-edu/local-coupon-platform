@@ -1,5 +1,6 @@
 package com.localcoupon.couponservice.common.dto.request;
 
+import com.localcoupon.couponservice.common.util.StringUtils;
 import org.hibernate.query.SortDirection;
 
 public record CursorPageRequest(
@@ -20,8 +21,8 @@ public record CursorPageRequest(
         return new CursorPageRequest(
                 cursor == null ? 0L : cursor,
                 size == null ? DEFAULT_SIZE : size,
-                sortBy.isEmpty() ? DEFAULT_SORT_BY : sortBy,
-                direction.isEmpty() ? SortDirection.DESCENDING : SortDirection.valueOf(direction.toUpperCase())
+                StringUtils.isEmpty(sortBy) ? DEFAULT_SORT_BY : sortBy,
+                StringUtils.isEmpty(direction) ? SortDirection.DESCENDING : SortDirection.valueOf(direction.toUpperCase())
         );
     }
 }

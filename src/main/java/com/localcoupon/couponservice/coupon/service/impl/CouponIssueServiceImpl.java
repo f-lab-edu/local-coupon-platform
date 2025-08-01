@@ -62,7 +62,7 @@ public class CouponIssueServiceImpl implements CouponIssueService {
         String lockKey = redisProperties.couponLockPrefix() + couponId;
         String dataKey = redisProperties.couponOpenPrefix() + couponId;
 
-        if (isCouponOpen(couponId)) {
+        if (!isCouponOpen(couponId)) {
             throw new UserCouponException(UserCouponErrorCode.ENDED_COUPON_ISSUE);
         }
 
