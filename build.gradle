@@ -59,6 +59,7 @@ dependencies {
 	implementation libs.spring.boot.starter.security
 	implementation libs.spring.boot.starter.batch
 	implementation libs.spring.boot.starter.mail
+	implementation libs.spring.boot.starter.amqp
 	implementation libs.actuator
 
 	compileOnly libs.lombok

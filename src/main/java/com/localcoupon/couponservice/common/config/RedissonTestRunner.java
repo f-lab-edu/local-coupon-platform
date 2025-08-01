@@ -18,7 +18,7 @@ public class RedissonTestRunner implements CommandLineRunner {
         bucket.set("connected");
 
         String value = bucket.get();
-        System.out.println("✅ Redisson Sentinel 연결 성공, 값 = " + value);
+        System.out.println("Redisson HealthCheck, 값 = " + value);
     }
 }
 
