@@ -6,6 +6,7 @@ import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
 import com.localcoupon.couponservice.coupon.repository.CouponRepository;
+import com.localcoupon.couponservice.coupon.repository.IssuedCouponRepository;
 import com.localcoupon.couponservice.coupon.service.CouponIssueService;
 import com.localcoupon.couponservice.coupon.service.UserCouponService;
 import com.localcoupon.couponservice.user.entity.User;
@@ -25,6 +26,7 @@ public class UserCouponServiceImpl implements UserCouponService {
     private final CouponIssueService couponIssueService;
     private final CouponRepository couponRepository;
     private final UserRepository userRepository;
+    private final IssuedCouponRepository issuedCouponRepository;
 
     @Override
     public List<UserIssuedCouponResponseDto> getUserCoupons() {
@@ -41,6 +43,11 @@ public class UserCouponServiceImpl implements UserCouponService {
         // 2. 쿠폰 발급 엔티티 저장을 위한 유저 객체 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserExcpetion(UserErrorCode.USER_NOT_FOUND));
+
+        if (issuedCouponRepository.existsIssuedCouponByCouponIdAndUserId(coupon.getId(), user.getId())) {
+            log.info("[ProcessCouponIssue] 중복 발급 시도: userId={}, couponId={}", user.getId(), coupon.getId());
+            return Result.FAIL;
+        }
 
         //3. 비즈니스 처리
         return couponIssueService.processCouponIssue(coupon, user);

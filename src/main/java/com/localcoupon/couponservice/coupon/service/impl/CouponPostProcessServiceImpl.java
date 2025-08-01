@@ -1,5 +1,6 @@
 package com.localcoupon.couponservice.coupon.service.impl;
 
+import com.localcoupon.couponservice.coupon.entity.CouponPeriod;
 import com.localcoupon.couponservice.coupon.entity.IssuedCoupon;
 import com.localcoupon.couponservice.coupon.repository.IssuedCouponRepository;
 import com.localcoupon.couponservice.coupon.service.CouponPostProcessService;
@@ -22,9 +23,10 @@ public class CouponPostProcessServiceImpl implements CouponPostProcessService {
     public void sendQrCouponToUser(User user, IssuedCoupon issuedCoupon) {
         try {
             // 1. QR 토큰 생성
+            CouponPeriod couponValidPeriod = issuedCoupon.getCoupon().getValidPeriod();
             String qrToken = qrTokenService.generateQrToken(issuedCoupon.getId(),
-                    issuedCoupon.getCoupon().getCouponValidStartTime(),
-                    issuedCoupon.getCoupon().getCouponValidEndTime()
+                    couponValidPeriod.getStart(),
+                    couponValidPeriod.getEnd()
             );
 
             // 2. Cloudinary 업로드

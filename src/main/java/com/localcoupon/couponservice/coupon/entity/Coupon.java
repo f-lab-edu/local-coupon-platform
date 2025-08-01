@@ -7,15 +7,12 @@ import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.enums.CouponStock;
 import com.localcoupon.couponservice.store.entity.Store;
-import com.localcoupon.couponservice.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.Where;
 import org.hibernate.validator.constraints.Length;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -33,9 +30,6 @@ public class Coupon extends BaseEntity {
     @JoinColumn(name = "store_id")
     private Store store;
 
-//    @ManyToOne(fetch = FetchType.LAZY) //TODO Campaign 작업 시 추가
-//    @JoinColumn(name = "campaign_id")
-//    private Campaign campaign;
 
     @Enumerated(EnumType.STRING)
     private CouponScope scope;
@@ -53,17 +47,19 @@ public class Coupon extends BaseEntity {
     @Column(name = "coupon_issued_count")
     private int issuedCount;
 
-    @Column(name = "coupon_valid_start_time")
-    private LocalDateTime couponValidStartTime;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "start", column = @Column(name = "coupon_valid_start_time")),
+            @AttributeOverride(name = "end", column = @Column(name = "coupon_valid_end_time"))
+    })
+    private CouponPeriod validPeriod;
 
-    @Column(name = "coupon_valid_end_time")
-    private LocalDateTime couponValidEndTime;
-
-    @Column(name = "coupon_issue_start_time")
-    private LocalDateTime couponIssueStartTime;
-
-    @Column(name = "coupon_issue_end_time")
-    private LocalDateTime couponIssueEndTime;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "start", column = @Column(name = "coupon_issue_start_time")),
+            @AttributeOverride(name = "end", column = @Column(name = "coupon_issue_end_time"))
+    })
+    private CouponPeriod issuePeriod;
 
     public Coupon() {
     }
@@ -74,10 +70,8 @@ public class Coupon extends BaseEntity {
             String description,
             Integer totalCount,
             Integer issuedCount,
-            LocalDateTime couponValidStartTime,
-            LocalDateTime couponValidEndTime,
-            LocalDateTime couponIssueStartTime,
-            LocalDateTime couponIssueEndTime,
+            CouponPeriod validPeriod,
+            CouponPeriod issuePeriod,
             Store store
     ) {
         super();
@@ -87,19 +81,10 @@ public class Coupon extends BaseEntity {
         this.description = description;
         this.totalCount = totalCount;
         this.issuedCount = issuedCount;
-        this.couponValidStartTime = couponValidStartTime;
-        this.couponValidEndTime = couponValidEndTime;
-        this.couponIssueStartTime = couponIssueStartTime;
-        this.couponIssueEndTime = couponIssueEndTime;
+        this.validPeriod = validPeriod;
+        this.issuePeriod = issuePeriod;
     }
 
-    public boolean isExpiredForUse(LocalDateTime now) {
-        return now.isAfter(couponValidEndTime);
-    }
-
-    public boolean isExpiredForIssue(LocalDateTime now) {
-        return now.isAfter(couponIssueEndTime);
-    }
 
     public Coupon syncIssuedCount(int redisIssuedCount) {
         this.issuedCount = redisIssuedCount;
@@ -113,31 +98,31 @@ public class Coupon extends BaseEntity {
                 request.description(),
                 request.totalCount(),
                 CouponStock.INIT.getValue(),
-                request.couponValidStartTime(),
-                request.couponValidEndTime(),
-                request.couponIssueStartTime(),
-                request.couponIssueEndTime(),
+                request.validPeriod(),
+                request.issuePeriod(),
                 store
         );
     }
 
-    public IssuedCoupon issue(User user, String qrToken, String qrImageUrl, LocalDateTime issuedAt) {
-        return IssuedCoupon.of(user,this,qrToken, qrImageUrl, issuedAt);
-    }
-
-    public IssuedCoupon issueWithOutQrCode(User user,  LocalDateTime issuedAt) {
-        return IssuedCoupon.of(user,this,issuedAt);
-    }
-
     public Result update(CouponUpdateRequestDto request) {
-        this.scope = request.scope();
-        this.title = request.title();
-        this.description = request.description();
-        this.totalCount = request.totalCount();
-        this.couponValidStartTime = request.couponValidStartTime();
-        this.couponValidEndTime = request.couponValidEndTime();
-        this.couponIssueStartTime = request.couponIssueStartTime();
-        this.couponIssueEndTime = request.couponIssueEndTime();
+        if (request.scope() != null) {
+            this.scope = request.scope();
+        }
+        if (request.title() != null) {
+            this.title = request.title();
+        }
+        if (request.description() != null) {
+            this.description = request.description();
+        }
+        if (request.totalCount() != null) {
+            this.totalCount = request.totalCount();
+        }
+        if (request.couponValidStartTime() != null && request.couponValidEndTime() != null) {
+            this.validPeriod = new CouponPeriod(request.couponValidStartTime(), request.couponValidEndTime());
+        }
+        if (request.couponIssueStartTime() != null && request.couponIssueEndTime() != null) {
+            this.issuePeriod = new CouponPeriod(request.couponIssueStartTime(), request.couponIssueEndTime());
+        }
         return Result.SUCCESS;
     }
 }

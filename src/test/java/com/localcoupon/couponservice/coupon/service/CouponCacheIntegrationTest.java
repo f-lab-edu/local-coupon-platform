@@ -3,6 +3,7 @@ package com.localcoupon.couponservice.coupon.service;
 import com.localcoupon.couponservice.common.external.kakao.dto.KakaoGeocodeInfoDto;
 import com.localcoupon.couponservice.common.infra.RedisProperties;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
+import com.localcoupon.couponservice.coupon.entity.CouponPeriod;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
 import com.localcoupon.couponservice.store.dto.request.StoreRequestDto;
@@ -30,8 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class CouponRedissonServiceIntegrationTest {
 
     @Autowired
-    @Qualifier("couponRedissonServiceImpl")
-    private CouponCacheService couponRedissonServiceImpl;
+    @Qualifier("couponIssueServiceImpl")
+    private CouponIssueService couponRedissonServiceImpl;
 
     @Autowired
     private RedissonClient redissonClient;
@@ -145,11 +146,9 @@ class CouponRedissonServiceIntegrationTest {
                 "Coupon description",
                 10,
                 0,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusDays(7),
-                LocalDateTime.now(),
-                LocalDateTime.now().plusDays(7),
-                (Store.from(request,geoCodeInfo, 1L))
+                new CouponPeriod(LocalDateTime.now(), LocalDateTime.now().plusDays(7)),
+                new CouponPeriod(LocalDateTime.now(), LocalDateTime.now().plusDays(7)),
+                Store.from(request,geoCodeInfo, 1L)
         );
     }
 

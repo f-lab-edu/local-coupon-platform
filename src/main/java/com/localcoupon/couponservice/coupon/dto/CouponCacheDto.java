@@ -23,8 +23,8 @@ public record CouponCacheDto(
                 coupon.getScope().name(),
                 coupon.getTotalCount(),
                 coupon.getIssuedCount(),
-                coupon.getCouponValidStartTime().toString(),
-                coupon.getCouponValidEndTime().toString()
+                coupon.getValidPeriod().getStart().toString(),
+                coupon.getValidPeriod().getEnd().toString()
         );
     }
 

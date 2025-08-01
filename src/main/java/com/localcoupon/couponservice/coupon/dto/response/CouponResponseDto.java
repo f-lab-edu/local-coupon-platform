@@ -1,9 +1,8 @@
 package com.localcoupon.couponservice.coupon.dto.response;
 
 import com.localcoupon.couponservice.coupon.entity.Coupon;
+import com.localcoupon.couponservice.coupon.entity.CouponPeriod;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
-
-import java.time.LocalDateTime;
 
 public record CouponResponseDto (Long id,
                                  String title,
@@ -11,10 +10,8 @@ public record CouponResponseDto (Long id,
                                  CouponScope scope,
                                  int totalCount,
                                  int issuedCount,
-                                 LocalDateTime couponValidStartTime,
-                                 LocalDateTime couponValidEndTime,
-                                 LocalDateTime couponIssueStartTime,
-                                 LocalDateTime couponIssueEndTime
+                                 CouponPeriod validPeriod,
+                                 CouponPeriod issuePeriod
 ) {
     public static CouponResponseDto from(Coupon coupon) {
         return new CouponResponseDto(
@@ -24,10 +21,8 @@ public record CouponResponseDto (Long id,
                 coupon.getScope(),
                 coupon.getTotalCount(),
                 coupon.getIssuedCount(),
-                coupon.getCouponValidStartTime(),
-                coupon.getCouponValidEndTime(),
-                coupon.getCouponIssueStartTime(),
-                coupon.getCouponIssueEndTime()
+                coupon.getValidPeriod(),
+                coupon.getIssuePeriod()
         );
     }
 }

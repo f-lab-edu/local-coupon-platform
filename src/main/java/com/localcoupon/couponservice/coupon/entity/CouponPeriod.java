@@ -1,24 +1,35 @@
 package com.localcoupon.couponservice.coupon.entity;
 
-import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
-import com.localcoupon.couponservice.coupon.exception.UserCouponException;
+import com.localcoupon.couponservice.coupon.annotation.ValidPeriod;
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Embeddable
-public record CouponPeriod(LocalDateTime start, LocalDateTime end) {
-    public CouponPeriod {
-        if (start == null || end == null) {
-            throw new UserCouponException(UserCouponErrorCode.COUPON_VALIDATION_PREIOD_FAILED);
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ValidPeriod
+public class CouponPeriod {
+
+    @Column(name = "start_time")
+    private LocalDateTime start;
+
+    @Column(name = "end_time")
+    private LocalDateTime end;
+
+    public CouponPeriod(LocalDateTime start, LocalDateTime end) {
+        if (start == null || end == null || end.isBefore(start)) {
+            throw new IllegalArgumentException("쿠폰 기간이 잘못되었습니다.");
         }
-        if (end.isBefore(start)) {
-            throw new UserCouponException(UserCouponErrorCode.COUPON_VALIDATION_PREIOD_FAILED);
-        }
+        this.start = start;
+        this.end = end;
     }
 
-    // JPA용 no-args 생성자를 전체 생성자로 위임한다. (임시값)
-    public CouponPeriod() {
-        this(LocalDateTime.MIN, LocalDateTime.MIN);
+    public boolean isExpired(LocalDateTime now) {
+        return now.isAfter(end);
     }
 }
