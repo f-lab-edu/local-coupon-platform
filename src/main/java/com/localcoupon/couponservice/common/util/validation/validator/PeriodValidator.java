@@ -1,5 +1,6 @@
-package com.localcoupon.couponservice.coupon.annotation;
+package com.localcoupon.couponservice.common.util.validation.validator;
 
+import com.localcoupon.couponservice.common.util.validation.ValidPeriod;
 import com.localcoupon.couponservice.coupon.entity.CouponPeriod;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

@@ -1,5 +1,6 @@
-package com.localcoupon.couponservice.coupon.annotation;
+package com.localcoupon.couponservice.common.util.validation;
 
+import com.localcoupon.couponservice.common.util.validation.validator.PeriodValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -8,7 +9,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.TYPE})
+@Target({ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = PeriodValidator.class)
 public @interface ValidPeriod {

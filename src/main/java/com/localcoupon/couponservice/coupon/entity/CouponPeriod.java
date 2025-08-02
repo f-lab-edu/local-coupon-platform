@@ -1,6 +1,6 @@
 package com.localcoupon.couponservice.coupon.entity;
 
-import com.localcoupon.couponservice.coupon.annotation.ValidPeriod;
+import com.localcoupon.couponservice.common.util.validation.ValidPeriod;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
