@@ -1,11 +1,12 @@
 package com.localcoupon.couponservice.coupon.entity;
 
 import com.localcoupon.couponservice.common.entity.BaseEntity;
-import com.localcoupon.couponservice.common.enums.Result;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.enums.CouponStock;
+import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
+import com.localcoupon.couponservice.coupon.exception.UserCouponException;
 import com.localcoupon.couponservice.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -85,6 +86,9 @@ public class Coupon extends BaseEntity {
 
 
     public Coupon syncIssuedCount(int redisIssuedCount) {
+        if(redisIssuedCount < 0) {
+            throw new UserCouponException(UserCouponErrorCode.SOLD_OUT_COUPON);
+        }
         this.issuedCount = redisIssuedCount;
         return this;
     }
@@ -102,7 +106,7 @@ public class Coupon extends BaseEntity {
         );
     }
 
-    public Result update(CouponUpdateRequestDto request) {
+    public Coupon update(CouponUpdateRequestDto request) {
         if (request.scope() != null) {
             this.scope = request.scope();
         }
@@ -121,7 +125,7 @@ public class Coupon extends BaseEntity {
         if (request.issuePeriod() != null && request.issuePeriod().getStart() != null && request.issuePeriod().getEnd() != null) {
             this.issuePeriod = new CouponPeriod(request.issuePeriod().getStart(), request.issuePeriod().getEnd());
         }
-        return Result.SUCCESS;
+        return this;
     }
 }
 

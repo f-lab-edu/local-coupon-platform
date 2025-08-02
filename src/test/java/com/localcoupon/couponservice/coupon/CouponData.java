@@ -35,7 +35,7 @@ public class CouponData {
                 .totalCount(100)
                 .issuedCount(10)
                 .validPeriod(new CouponPeriod(now.minusDays(1), now.plusDays(10)))
-                .issuePeriod(new CouponPeriod(now.minusDays(1), now.minusDays(5)))
+                .issuePeriod(new CouponPeriod(now.minusDays(1), now.plusDays(5)))
                 .store(StoreData.defaultStore())
                 .build();
     }
