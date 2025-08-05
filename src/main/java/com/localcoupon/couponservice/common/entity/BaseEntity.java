@@ -5,7 +5,9 @@ import com.localcoupon.couponservice.common.enums.Result;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PreRemove;
 import lombok.Getter;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 @Getter
+@SQLRestriction("is_deleted = false")
 public abstract class BaseEntity {
     @CreatedDate
     @Column(name = BaseColumns.CREATED_AT, nullable = false, updatable = false)
@@ -30,5 +33,10 @@ public abstract class BaseEntity {
     public Result delete() {
         this.isDeleted = true;
         return Result.SUCCESS;
+    }
+
+    @PreRemove
+    public void softDelete() {
+        this.isDeleted = true;
     }
 }
