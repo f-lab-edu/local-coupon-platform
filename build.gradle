@@ -107,11 +107,26 @@ jacocoTestReport {
 	dependsOn test
 	reports {
 		xml.required.set(true)
+		html.required.set(true)
 		csv.required.set(false)
-		html.required.set(true) // HTML 보고서 생성
 		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
 	}
+	// 커버리지 대상 클래스 필터링
+	classDirectories.setFrom(
+			files(classDirectories.files.collect {
+				fileTree(dir: it, exclude: [
+						'**/Q*',                       // QueryDSL QClass
+						'**/*Config*',                 // Config 클래스
+						'**/*Application*',            // 메인 실행 클래스
+						'**/dto/**',                   // DTO (선택)
+						'**/enums/**',               // Enum (선택)
+						'**/constants/**',
+						'**/exception/**'
+				])
+			})
+	)
 }
+
 
 
 tasks.register('copyDocument', Copy) {

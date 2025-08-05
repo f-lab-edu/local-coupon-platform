@@ -7,8 +7,8 @@ import com.localcoupon.couponservice.auth.exception.PasswordNotMatchException;
 import com.localcoupon.couponservice.auth.repository.SessionRepository;
 import com.localcoupon.couponservice.auth.service.impl.AuthServiceImpl;
 import com.localcoupon.couponservice.common.util.PasswordEncoder;
-import com.localcoupon.couponservice.user.dto.request.SignUpRequestDto;
 import com.localcoupon.couponservice.user.entity.User;
+import com.localcoupon.couponservice.user.enums.UserRole;
 import com.localcoupon.couponservice.user.exception.UserNotFoundException;
 import com.localcoupon.couponservice.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,11 +57,15 @@ public class AuthServiceTest {
         String nickname = "dong";
 
         //이메일로 유저조회 실행 시 given 사전 정의 데이터로 변환한다.
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(
-                User.from(SignUpRequestDto.of
-                        (email,rawPassword,nickname,address,regionCode))));
+        User user = User.builder()
+                .id(1L)
+                .email(email)
+                .passwordEnc(PasswordEncoder.encrypt(rawPassword))
+                .nickname(nickname)
+                .role(UserRole.ROLE_USER)
+                .build();
+        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
 
-        //repository save도 true를 반환한다고 가정한다.
         when(sessionRepository.save(anyString(), any(UserSessionDto.class))).thenReturn(true);
 
 
