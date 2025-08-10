@@ -1,6 +1,5 @@
 package com.localcoupon.couponservice.coupon.dto;
 
-import com.localcoupon.couponservice.coupon.util.StringUtils;
 import org.hibernate.query.SortDirection;
 
 public record CursorPageRequest(

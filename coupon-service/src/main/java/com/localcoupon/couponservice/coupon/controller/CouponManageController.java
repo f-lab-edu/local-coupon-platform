@@ -1,8 +1,8 @@
 package com.localcoupon.couponservice.coupon.controller;
 
-import com.localcoupon.common.constants.ApiMapping;
 import com.localcoupon.common.dto.response.SuccessResponse;
 import com.localcoupon.couponservice.coupon.annotation.CursorRequest;
+import com.localcoupon.couponservice.coupon.dto.CursorPageRequest;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponVerifyRequestDto;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(ApiMapping.COUPON_MANAGE_BASE)
+@RequestMapping(COUPON_MANAGE_BASE)
 public class CouponManageController {
 
     private final CouponManageService couponManageService;

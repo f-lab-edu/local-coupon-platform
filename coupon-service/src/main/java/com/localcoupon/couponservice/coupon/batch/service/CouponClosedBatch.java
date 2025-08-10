@@ -1,7 +1,6 @@
 package com.localcoupon.couponservice.coupon.batch.service;
 
-import com.localcoupon.otherservice.coupon.common.enums.Result;
-import com.localcoupon.otherservice.coupon.common.infra.RedisProperties;
+import com.localcoupon.common.enums.Result;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.repository.CouponRedisRepository;
 import com.localcoupon.couponservice.coupon.repository.CouponRepository;
@@ -22,7 +21,6 @@ public class CouponClosedBatch {
 
     private final CouponRepository couponRepository;
     private final CouponRedisRepository couponRedisRepository;
-    private final RedisProperties redisProperties;
     private final Clock clock;
 
     @Scheduled(cron = "0 0 */1 * * *")
@@ -42,7 +40,7 @@ public class CouponClosedBatch {
     }
 
     private Result syncIssuedCountToDb(Coupon coupon) {
-        String redisKey = redisProperties.couponOpenPrefix() + coupon.getId();
+        String redisKey = "coupon:open:" + coupon.getId();
 
         return couponRedisRepository.getValue(redisKey, String.class)
                 .map(Integer::parseInt)
@@ -57,7 +55,7 @@ public class CouponClosedBatch {
     }
 
     private boolean deleteRedisKey(Long couponId) {
-        if (couponRedisRepository.deleteData(redisProperties.couponOpenPrefix() + couponId)) {
+        if (couponRedisRepository.deleteData("coupon:open:" + couponId)) {
             log.info("[Coupon-Closed-Batch] Deleted Redis couponId: {}", couponId);
             return true;
         }

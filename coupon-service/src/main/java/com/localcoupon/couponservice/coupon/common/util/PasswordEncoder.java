@@ -1,4 +1,4 @@
-package com.localcoupon.couponservice.coupon.util;
+package com.localcoupon.couponservice.coupon.common.util;
 
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;

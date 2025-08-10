@@ -1,4 +1,4 @@
-package com.localcoupon.couponservice.coupon.util;
+package com.localcoupon.couponservice.coupon.common.util;
 
 public class StringUtils {
     public static boolean hasText(String value) {

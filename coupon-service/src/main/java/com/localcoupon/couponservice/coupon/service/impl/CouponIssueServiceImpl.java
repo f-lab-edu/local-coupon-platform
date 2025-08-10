@@ -1,8 +1,6 @@
 package com.localcoupon.couponservice.coupon.service.impl;
 
-import com.localcoupon.otherservice.common.enums.Result;
-import com.localcoupon.otherservice.common.infra.RedisProperties;
-import com.localcoupon.otherservice.common.util.TimeProvider;
+import com.localcoupon.common.enums.Result;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.entity.IssuedCoupon;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
@@ -11,7 +9,6 @@ import com.localcoupon.couponservice.coupon.repository.CouponRedisRepository;
 import com.localcoupon.couponservice.coupon.repository.IssuedCouponRepository;
 import com.localcoupon.couponservice.coupon.service.CouponIssueService;
 import com.localcoupon.couponservice.coupon.service.CouponPostProcessService;
-import com.localcoupon.otherservice.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -29,14 +26,13 @@ import java.time.LocalDateTime;
 public class CouponIssueServiceImpl implements CouponIssueService {
 
     private final CouponRedisRepository couponRedisRepository;
-    private final RedisProperties redisProperties;
     private final IssuedCouponRepository issuedCouponRepository;
     private final CouponPostProcessService couponPostProcessService;
     private final TimeProvider timeProvider;
 
     @Override
     public Coupon saveCouponForOpen(Coupon coupon) {
-        String key = redisProperties.couponOpenPrefix() + coupon.getId();
+        String key = "coupon:open:" + coupon.getId();
 
         long ttlSeconds = Duration.between(
                 LocalDateTime.now(),
@@ -53,14 +49,14 @@ public class CouponIssueServiceImpl implements CouponIssueService {
 
     @Override
     public boolean isCouponOpen(Long couponId) {
-        String key = redisProperties.couponOpenPrefix() + couponId;
+        String key = "coupon:open:" + couponId;
         return couponRedisRepository.exists(key);
     }
 
     @Override
     public int decreaseCouponStock(Long couponId) {
-        String lockKey = redisProperties.couponLockPrefix() + couponId;
-        String dataKey = redisProperties.couponOpenPrefix() + couponId;
+        String lockKey = "coupon:lock:" + couponId;
+        String dataKey = "coupon:open:" + couponId;
 
         if (!isCouponOpen(couponId)) {
             throw new UserCouponException(UserCouponErrorCode.ENDED_COUPON_ISSUE);
@@ -77,8 +73,8 @@ public class CouponIssueServiceImpl implements CouponIssueService {
 
     @Override
     public int increaseCouponStock(Long couponId) {
-        String lockKey = redisProperties.couponLockPrefix() + couponId;
-        String dataKey = redisProperties.couponOpenPrefix() + couponId;
+        String lockKey = "coupon:lock:" + couponId;
+        String dataKey = "coupon:open:" + couponId;
 
         return couponRedisRepository.executeWithLock(
                 lockKey,
