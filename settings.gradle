@@ -1,3 +1,2 @@
-rootProject.name = 'couponservice'
-dependencyResolutionManagement {
-}
+rootProject.name = 'localcoupon'
+include ('gateway', 'common', 'coupon-service', 'other-service')

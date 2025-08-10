@@ -4,22 +4,12 @@ plugins {
 	id 'org.springframework.boot' version '3.2.8' apply false
 }
 
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:2023.0.1"
-	}
-}
-
-
 group = 'com.localcoupon'
 version = '0.0.1-SNAPSHOT'
-
 
 allprojects {
 	repositories {
 		mavenCentral()
-		// Milestone 저장소 추가
-		maven { url 'https://repo.spring.io/milestone' }
 	}
 }
 
@@ -28,9 +18,22 @@ subprojects {
 	apply plugin: 'io.spring.dependency-management'
 
 	java {
-		toolchain {
-			languageVersion = JavaLanguageVersion.of(17)
+		toolchain { languageVersion = JavaLanguageVersion.of(17) }
+	}
+
+	ext {
+		springCloudVersion = '2023.0.3'
+	}
+	dependencyManagement {
+		imports {
+			mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 		}
+	}
+
+	dependencies {
+		compileOnly 'org.projectlombok:lombok'
+		annotationProcessor 'org.projectlombok:lombok'
+		testImplementation 'org.junit.jupiter:junit-jupiter'
 	}
 
 	tasks.withType(Test) {
@@ -38,22 +41,29 @@ subprojects {
 	}
 }
 
-// === 도메인 모듈 공통 설정 ===
-configure(subprojects.findAll { it.name.endsWith("-domain") }) {
-	dependencies {
-		compileOnly 'org.projectlombok:lombok'
-		annotationProcessor 'org.projectlombok:lombok'
-		implementation 'org.springframework.boot:spring-boot-starter-validation'
-	}
+/** =========================
+ *  서비스 모듈 공통(-service)
+ *  - Spring Boot 실행 JAR
+ *  - 공통 테스트 설정
+ *  ========================= */
+configure(subprojects.findAll { it.name.endsWith("-service") }) {
+	apply plugin: 'org.springframework.boot'
+	// 부트 모듈은 실행 JAR만 생성
+	bootJar { enabled = true }
+	jar { enabled = false }
 
-	def generated = "$buildDir/generated/sources/annotationProcessor/java/main"
-	tasks.withType(JavaCompile) {
-		options.getGeneratedSourceOutputDirectory().set(file(generated))
+	dependencies {
+		// 각 서비스 공통으로 자주 쓰는 것들 원하면 여기서 추가 가능
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	}
-	sourceSets {
-		main.java.srcDirs += [ generated ]
-	}
-	clean {
-		delete file(generated)
-	}
+}
+
+/** =========================
+ *  공용/라이브러리 모듈(common 등)
+ *  - 서비스가 아닌 모든 모듈에 적용
+ *  - 라이브러리 JAR만 생성
+ *  ========================= */
+configure(subprojects.findAll { !it.name.endsWith("-service") && !it.name.endsWith("-domain") }) {
+	tasks.matching { it.name == 'bootJar' }.configureEach { enabled = false }
+	jar { enabled = true }
 }

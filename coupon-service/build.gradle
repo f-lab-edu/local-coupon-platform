@@ -50,7 +50,7 @@ dependencies {
 	// QR & Cloudinary
 	implementation 'com.google.zxing:core:3.5.3'
 	implementation 'com.google.zxing:javase:3.5.3'
-	implementation 'com.cloudinary:cloudinary-http44:1.36.0'
+	implementation 'com.cloudinary:cloudinary-http44:1.37.0'
 
 	// 모니터링
 	implementation 'io.micrometer:micrometer-registry-prometheus'

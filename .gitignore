@@ -41,4 +41,4 @@ out/
 .env
 
 # Local config
-src/main/generated/
+coupon-service/src/main/generated/
