@@ -1,6 +1,7 @@
 package com.localcoupon.couponservice.coupon.dto;
 
 import org.hibernate.query.SortDirection;
+import org.springframework.util.StringUtils;
 
 public record CursorPageRequest(
         Long cursor,

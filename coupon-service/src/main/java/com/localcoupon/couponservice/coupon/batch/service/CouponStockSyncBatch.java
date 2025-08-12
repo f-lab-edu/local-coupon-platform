@@ -30,7 +30,7 @@ public class CouponStockSyncBatch {
     }
 
     @Transactional
-    protected int syncSingleCoupon(String redisKey) {
+    public int syncSingleCoupon(String redisKey) {
         Long couponId = extractCouponId(redisKey);
 
         Optional<String> redisValue = couponRedisRepository.getValue(redisKey, String.class);

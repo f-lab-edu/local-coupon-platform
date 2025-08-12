@@ -4,9 +4,6 @@ spring:
       charset: UTF-8
       enabled: true
       force: true
-  config:
-    import:
-      - classpath:redis-prefix.yml
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: Asia/Seoul

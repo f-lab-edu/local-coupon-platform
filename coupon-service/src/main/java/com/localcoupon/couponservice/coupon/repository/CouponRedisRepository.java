@@ -1,10 +1,9 @@
 package com.localcoupon.couponservice.coupon.repository;
 
-import com.localcoupon.otherservice.common.enums.CommonErrorCode;
-import com.localcoupon.otherservice.common.enums.Result;
-import com.localcoupon.otherservice.common.exception.CommonException;
-import com.localcoupon.otherservice.common.infra.RedisProperties;
-import com.localcoupon.otherservice.common.util.CouponUtils;
+import com.localcoupon.common.enums.CommonErrorCode;
+import com.localcoupon.common.enums.Result;
+import com.localcoupon.common.exception.CommonException;
+import com.localcoupon.couponservice.coupon.common.util.CouponUtils;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,6 @@ import java.util.function.Supplier;
 public class CouponRedisRepository {
 
     private final RedissonClient redissonClient;
-    private final RedisProperties redisProperties;
 
     public <T> T executeWithLock(
             String lockKey,
@@ -88,7 +86,7 @@ public class CouponRedisRepository {
 
     public Iterable<String> getAllOpenCouponKeys() {
         try {
-            String pattern = redisProperties.couponOpenPrefix() + "*";
+            String pattern = "coupon:open" + "*";
             return redissonClient.getKeys().getKeysByPattern(pattern);
         } catch (Exception e) {
             log.error("[Redis] Failed to get keys by pattern", e);

@@ -1,6 +1,6 @@
 package com.localcoupon.couponservice.coupon.common.config;
 
-import com.localcoupon.otherservice.common.interceptor.LoggingInterceptor;
+import com.localcoupon.couponservice.coupon.common.interceptor.LoggingInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;

@@ -1,5 +1,7 @@
 package com.localcoupon.couponservice.coupon.service.impl;
 
+import com.localcoupon.common.enums.Result;
+import com.localcoupon.couponservice.coupon.dto.CursorPageRequest;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;
@@ -9,42 +11,38 @@ import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.entity.IssuedCoupon;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
+import com.localcoupon.couponservice.coupon.internal.store.StoreServiceClient;
+import com.localcoupon.couponservice.coupon.internal.store.dto.StoreSummaryDto;
 import com.localcoupon.couponservice.coupon.repository.CouponRepository;
 import com.localcoupon.couponservice.coupon.repository.IssuedCouponRepository;
 import com.localcoupon.couponservice.coupon.service.CouponManageService;
 import com.localcoupon.couponservice.coupon.service.QrTokenService;
 import lombok.RequiredArgsConstructor;
-import org.bouncycastle.util.StoreException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class CouponManageServiceImpl implements CouponManageService {
     private final CouponRepository couponRepository;
-    private final StoreRepository storeRepository;
     private final IssuedCouponRepository issuedCouponRepository;
     private final QrTokenService qrTokenService;
+    private final StoreServiceClient storeServiceClient;
 
     @Override
     @Transactional
     public CouponResponseDto createCoupon(CouponCreateRequestDto request, Long userId) {
-        Store store = storeRepository.findByOwnerId(userId)
-                .orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND_EXCEPTION));
-
-        Coupon savedCoupon = couponRepository.save(Coupon.from(request, store));
+        StoreSummaryDto store = storeServiceClient.getMyStore(userId);
+        Coupon savedCoupon = couponRepository.save(Coupon.from(request, store.id()));
 
         return CouponResponseDto.from(savedCoupon);
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public ListCouponResponseDto getCouponsByOwner(Long ownerId, CursorPageRequest request) {
-        List<Coupon> coupons = couponRepository.findAllByOwnerIdWithCursorPaging(ownerId, request);
-        return ListCouponResponseDto.from(coupons);
+        return ListCouponResponseDto.from(couponRepository.findAllByOwnerIdWithCursorPaging(ownerId, request),
+                storeServiceClient.getMyStore(ownerId));
     }
 
     @Override

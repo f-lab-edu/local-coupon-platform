@@ -1,6 +1,6 @@
 package com.localcoupon.couponservice.coupon.repository;
 
-import com.localcoupon.otherservice.common.dto.request.CursorPageRequest;
+import com.localcoupon.couponservice.coupon.dto.CursorPageRequest;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
 
 import java.util.List;

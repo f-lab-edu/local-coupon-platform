@@ -1,10 +1,9 @@
 package com.localcoupon.couponservice.coupon.repository.impl;
 
-import com.localcoupon.otherservice.common.dto.request.CursorPageRequest;
+import com.localcoupon.couponservice.coupon.dto.CursorPageRequest;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
-import com.localcoupon.otherservice.coupon.entity.QCoupon;
+import com.localcoupon.couponservice.coupon.entity.QCoupon;
 import com.localcoupon.couponservice.coupon.repository.CouponRepositoryCustom;
-import com.localcoupon.otherservice.store.entity.QStore;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -29,7 +28,6 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
     public List<Coupon> findAllByOwnerIdWithCursorPaging(Long ownerId, CursorPageRequest request) {
 //        //QueryDSL이 생성한 클래스들 인스턴스화
         QCoupon coupon = QCoupon.coupon;
-        QStore store = QStore.store;
 
 
         //엔티티 이름 정보 불러오기 path.get("id") -> coupon.id
@@ -45,10 +43,8 @@ public class CouponRepositoryImpl implements CouponRepositoryCustom {
 
         return queryFactory
                 .selectFrom(coupon)
-                .join(coupon.store, store).fetchJoin()
                 .where(
                         coupon.isDeleted.isFalse(),
-                        store.ownerId.eq(ownerId),
                         cursorPaging(coupon, request)
                 )
                 .orderBy(orderSpecifier)

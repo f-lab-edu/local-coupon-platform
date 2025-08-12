@@ -2,7 +2,6 @@ package com.localcoupon.couponservice.coupon.entity;
 
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
-import com.localcoupon.otherservice.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,9 +19,8 @@ public class IssuedCoupon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private Long userId;
 
     // 해당 쿠폰
     @ManyToOne(fetch = FetchType.LAZY)
@@ -44,8 +42,8 @@ public class IssuedCoupon {
     @Column(name = "is_used")
     private boolean isUsed;
 
-    public IssuedCoupon(User user, Coupon coupon, LocalDateTime issuedAt, LocalDateTime usedAt, String qrToken, boolean isUsed, String qrImageUrl) {
-        this.user = user;
+    public IssuedCoupon(Long userId, Coupon coupon, LocalDateTime issuedAt, LocalDateTime usedAt, String qrToken, boolean isUsed, String qrImageUrl) {
+        this.userId = userId;
         this.coupon = coupon;
         this.issuedAt = issuedAt;
         this.usedAt = usedAt;
@@ -54,8 +52,8 @@ public class IssuedCoupon {
         this.isUsed = isUsed;
     }
 
-    public IssuedCoupon(User user, Coupon coupon, LocalDateTime issuedAt) {
-        this.user = user;
+    public IssuedCoupon(Long userId, Coupon coupon, LocalDateTime issuedAt) {
+        this.userId = userId;
         this.coupon = coupon;
         this.issuedAt = issuedAt;
     }
@@ -78,15 +76,11 @@ public class IssuedCoupon {
         return this;
     }
 
-    public static IssuedCoupon issueWithOutQrCode(User user, Coupon coupon, LocalDateTime issuedAt) {
-        return IssuedCoupon.of(user,coupon,issuedAt);
+    public static IssuedCoupon of(Long userId, Coupon coupon, String qrToken,  String qrImageUrl, LocalDateTime issuedAt) {
+        return new IssuedCoupon(userId,coupon,issuedAt,null,qrToken,false, qrImageUrl);
     }
 
-    public static IssuedCoupon of(User user, Coupon coupon, String qrToken,  String qrImageUrl, LocalDateTime issuedAt) {
-        return new IssuedCoupon(user,coupon,issuedAt,null,qrToken,false, qrImageUrl);
-    }
-
-    public static IssuedCoupon of(User user, Coupon coupon, LocalDateTime issuedAt) {
-        return new IssuedCoupon(user,coupon,issuedAt);
+    public static IssuedCoupon of(Long userId, Coupon coupon) {
+        return new IssuedCoupon(userId,coupon,LocalDateTime.now());
     }
 }

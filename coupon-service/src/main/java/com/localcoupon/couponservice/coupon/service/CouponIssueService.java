@@ -2,7 +2,6 @@ package com.localcoupon.couponservice.coupon.service;
 
 import com.localcoupon.common.enums.Result;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
-import com.localcoupon.otherservice.user.entity.User;
 
 public interface CouponIssueService {
 
@@ -14,5 +13,5 @@ public interface CouponIssueService {
 
     int increaseCouponStock(Long couponId);
 
-    Result processCouponIssue(Coupon coupon, User user);
+    Result processCouponIssue(Coupon coupon, Long userId, String userEmail);
 }

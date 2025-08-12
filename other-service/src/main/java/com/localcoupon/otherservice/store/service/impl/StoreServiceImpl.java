@@ -8,9 +8,10 @@ import com.localcoupon.otherservice.store.dto.request.StoreRequestDto;
 import com.localcoupon.otherservice.store.dto.request.UserStoreSearchRequestDto;
 import com.localcoupon.otherservice.store.dto.response.StoreResponseDto;
 import com.localcoupon.otherservice.store.entity.Store;
+import com.localcoupon.otherservice.store.enums.StoreErrorCode;
+import com.localcoupon.otherservice.store.exception.StoreException;
 import com.localcoupon.otherservice.store.repository.StoreRepository;
 import com.localcoupon.otherservice.store.service.StoreService;
-import com.localcoupon.otherservice.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,6 @@ import java.util.stream.Collectors;
 public class StoreServiceImpl implements StoreService {
 
     private final StoreRepository storeRepository;
-    private final UserRepository userRepository;
     private final KakaoGeocodeService kakaoGeocodeService;
 
     @Override
@@ -43,12 +43,10 @@ public class StoreServiceImpl implements StoreService {
     }
 
     @Override
-    public List<StoreResponseDto> getMyStores(Long userId) {
-        List<Store> stores = storeRepository.findByOwnerIdAndIsDeletedFalse(userId);
-
-        return stores.stream()
+    public StoreResponseDto getMyStores(Long userId) {
+        return storeRepository.findFirstByOwnerIdAndIsDeletedFalse(userId)
                 .map(StoreResponseDto::fromEntity)
-                .collect(Collectors.toList());
+                .orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND_EXCEPTION));
     }
 
     @Override

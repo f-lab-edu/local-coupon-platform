@@ -1,13 +1,12 @@
 package com.localcoupon.couponservice.coupon.entity;
 
-import com.localcoupon.otherservice.common.entity.BaseEntity;
+import com.localcoupon.couponservice.coupon.common.entity.BaseEntity;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.enums.CouponScope;
 import com.localcoupon.couponservice.coupon.enums.CouponStock;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
-import com.localcoupon.otherservice.store.entity.Store;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,11 +24,6 @@ public class Coupon extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id")
-    private Store store;
-
-
     @Enumerated(EnumType.STRING)
     private CouponScope scope;
 
@@ -45,6 +39,9 @@ public class Coupon extends BaseEntity {
 
     @Column(name = "coupon_issued_count")
     private int issuedCount;
+
+    @Column(name = "store_id")
+    private Long storeId;
 
     @Embedded
     @AttributeOverrides({
@@ -71,10 +68,9 @@ public class Coupon extends BaseEntity {
             Integer issuedCount,
             CouponPeriod validPeriod,
             CouponPeriod issuePeriod,
-            Store store
+            Long storeId
     ) {
         super();
-        this.store = store;
         this.scope = scope;
         this.title = title;
         this.description = description;
@@ -82,6 +78,7 @@ public class Coupon extends BaseEntity {
         this.issuedCount = issuedCount;
         this.validPeriod = validPeriod;
         this.issuePeriod = issuePeriod;
+        this.storeId = storeId;
     }
 
 
@@ -93,7 +90,7 @@ public class Coupon extends BaseEntity {
         return this;
     }
 
-    public static Coupon from(CouponCreateRequestDto request, Store store) {
+    public static Coupon from(CouponCreateRequestDto request, Long storeId) {
         return new Coupon(
                 request.scope(),
                 request.title(),
@@ -102,7 +99,7 @@ public class Coupon extends BaseEntity {
                 CouponStock.INIT.getValue(),
                 request.validPeriod(),
                 request.issuePeriod(),
-                store
+                storeId
         );
     }
 

@@ -10,7 +10,7 @@ public interface StoreService {
 
     StoreResponseDto registerStore(StoreRequestDto request, Long userId);
 
-    List<StoreResponseDto> getMyStores(Long userId);
+    StoreResponseDto getMyStores(Long userId);
     List<StoreResponseDto> getStoresNearby(UserStoreSearchRequestDto request);
 
 }

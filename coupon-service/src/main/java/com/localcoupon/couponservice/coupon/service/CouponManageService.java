@@ -1,7 +1,7 @@
 package com.localcoupon.couponservice.coupon.service;
 
-import com.localcoupon.otherservice.common.dto.request.CursorPageRequest;
-import com.localcoupon.otherservice.common.enums.Result;
+import com.localcoupon.common.enums.Result;
+import com.localcoupon.couponservice.coupon.dto.CursorPageRequest;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.response.CouponResponseDto;

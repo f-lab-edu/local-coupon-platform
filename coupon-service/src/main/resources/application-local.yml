@@ -1,3 +1,15 @@
+services:
+  other:
+    base-url: http://localhost:8082
+feign:
+  client:
+    config:
+      default:
+        loadbalancer: false
+      storeClient:
+        url: ${services.other.base-url}
+      userClient:
+        url: ${services.other.base-url}
 spring:
   cloud:
     compatibility-verifier:
@@ -26,7 +38,7 @@ spring:
         highlight_sql: true
     show-sql: true
   config:
-    import: optional:file:.env[.properties]
+    import: optional:file:./coupon-service/.env[.properties]
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}

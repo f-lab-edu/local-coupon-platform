@@ -28,7 +28,6 @@ public class CouponIssueServiceImpl implements CouponIssueService {
     private final CouponRedisRepository couponRedisRepository;
     private final IssuedCouponRepository issuedCouponRepository;
     private final CouponPostProcessService couponPostProcessService;
-    private final TimeProvider timeProvider;
 
     @Override
     public Coupon saveCouponForOpen(Coupon coupon) {
@@ -87,16 +86,16 @@ public class CouponIssueServiceImpl implements CouponIssueService {
 
     @Override
     @Transactional
-    public Result processCouponIssue(Coupon coupon, User user) {
+    public Result processCouponIssue(Coupon coupon, Long userId, String userEmail) {
         try {
             // 1. 쿠폰 재고 처리
             decreaseCouponStock(coupon.getId());
             // 2. 쿠폰 발급 진행 (QR 정보는 후처리에서 업데이트)
-            IssuedCoupon issuedCoupon = IssuedCoupon.of(user, coupon, timeProvider.now());
+            IssuedCoupon issuedCoupon = IssuedCoupon.of(userId, coupon);
             // 3. 쿠폰 발급 저장
             issuedCouponRepository.save(issuedCoupon);
             // 4. 쿠폰 후처리 비동기 로직 실행 (qr 발송)
-            couponPostProcessService.sendQrCouponToUser(user, issuedCoupon);
+            couponPostProcessService.sendQrCouponToUser(userEmail, issuedCoupon);
             return Result.SUCCESS;
         } catch (Exception e) {
             // 예외가 발생한 경우 롤백 작업 수행

@@ -7,6 +7,7 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.localcoupon.common.enums.CommonErrorCode;
 import com.localcoupon.common.exception.CommonException;
+import com.localcoupon.couponservice.coupon.service.ImageService;
 import com.localcoupon.couponservice.coupon.service.QrTokenService;
 import com.localcoupon.couponservice.coupon.util.TokenGenerator;
 import lombok.RequiredArgsConstructor;

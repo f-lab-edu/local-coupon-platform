@@ -27,8 +27,8 @@ public class StoreController {
     }
 
     @GetMapping("/my")
-    public SuccessResponse<List<StoreResponseDto>> getMyStores(@RequestHeader("X-USER-ID") Long userId) {
-        List<StoreResponseDto> stores = storeService.getMyStores(userId);
+    public SuccessResponse<StoreResponseDto> getMyStores(@RequestHeader("X-USER-ID") Long userId) {
+        StoreResponseDto stores = storeService.getMyStores(userId);
         return SuccessResponse.of(stores);
     }
 

@@ -5,6 +5,7 @@ import com.localcoupon.couponservice.coupon.dto.response.UserIssuedCouponRespons
 import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
+import com.localcoupon.couponservice.coupon.internal.user.UserServiceClient;
 import com.localcoupon.couponservice.coupon.repository.CouponRepository;
 import com.localcoupon.couponservice.coupon.repository.IssuedCouponRepository;
 import com.localcoupon.couponservice.coupon.service.CouponIssueService;
@@ -21,7 +22,7 @@ import java.util.List;
 public class UserCouponServiceImpl implements UserCouponService {
     private final CouponIssueService couponIssueService;
     private final CouponRepository couponRepository;
-    private final UserRepository userRepository;
+    private final UserServiceClient userServiceClient;
     private final IssuedCouponRepository issuedCouponRepository;
 
     @Override
@@ -31,21 +32,19 @@ public class UserCouponServiceImpl implements UserCouponService {
 
 
     @Override
-    public Result issueCoupon(Long userId, Long couponId) {
+    public Result issueCoupon(Long userId, Long couponId, String userEmail) {
         // 1. 쿠폰 조회
         Coupon coupon = couponRepository.findById(couponId)
                 .orElseThrow(() -> new UserCouponException(UserCouponErrorCode.COUPON_NOT_FOUND));
 
-        // 2. 쿠폰 발급 엔티티 저장을 위한 유저 객체 조회
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserExcpetion(UserErrorCode.USER_NOT_FOUND));
 
-        if (issuedCouponRepository.existsIssuedCouponByCouponIdAndUserId(coupon.getId(), user.getId())) {
-            log.info("[ProcessCouponIssue] 중복 발급 시도: userId={}, couponId={}", user.getId(), coupon.getId());
+        //이미 쿠폰 발급이 되어있는지 확인검사한다.
+        if (issuedCouponRepository.existsIssuedCouponByCouponIdAndUserId(coupon.getId(), userId)) {
+            log.info("[ProcessCouponIssue] 중복 발급 시도: userId={}, couponId={}", userId, coupon.getId());
             return Result.FAIL;
         }
 
         //3. 비즈니스 처리
-        return couponIssueService.processCouponIssue(coupon, user);
+        return couponIssueService.processCouponIssue(coupon, userId, userEmail);
     }
 }

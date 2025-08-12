@@ -1,6 +1,6 @@
 package com.localcoupon.couponservice.coupon.service.impl;
 
-import com.localcoupon.otherservice.common.enums.Result;
+import com.localcoupon.common.enums.Result;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;
 import jakarta.mail.MessagingException;

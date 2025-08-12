@@ -1,11 +1,11 @@
 package com.localcoupon.couponservice.coupon.common.config;
 
-import com.localcoupon.otherservice.common.util.StringUtils;
 import jakarta.servlet.Filter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 
 @Configuration
 public class GlobalFilterConfig {

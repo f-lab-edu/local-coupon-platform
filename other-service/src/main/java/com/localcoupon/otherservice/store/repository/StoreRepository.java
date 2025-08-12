@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface StoreRepository extends JpaRepository<Store, Long> {
     Optional<Store> findByOwnerId(Long ownerId);
-    List<Store> findByOwnerIdAndIsDeletedFalse(Long ownerId);
+    Optional<Store> findFirstByOwnerIdAndIsDeletedFalse(Long ownerId);
     @Query("""
         SELECT s
         FROM Store s

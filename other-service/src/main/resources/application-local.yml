@@ -1,20 +1,6 @@
 server:
   port: 8082
 spring:
-  cloud:
-    compatibility-verifier:
-      enabled: false
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_SENDER}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
   jpa:
     open-in-view: false
     hibernate:
@@ -28,7 +14,7 @@ spring:
         highlight_sql: true
     show-sql: true
   config:
-    import: optional:file:.env[.properties]
+    import: optional:file:./other-service/.env[.properties]
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
