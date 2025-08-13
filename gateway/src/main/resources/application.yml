@@ -1,0 +1,39 @@
+server:
+  port: 8080
+
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 5000
+  cloud:
+    gateway:
+      routes:
+        - id: coupon-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/coupons/**
+          filters:
+            - StripPrefix=2
+
+        - id: coupon-service-manage
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/coupon-manage/**
+          filters:
+            - StripPrefix=2
+
+        - id: coupon-service-user
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/v1/user-coupons/**
+          filters:
+            - StripPrefix=2
+
+        - id: other-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/**
+          filters:
+            - StripPrefix=2

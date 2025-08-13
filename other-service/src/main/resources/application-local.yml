@@ -1,0 +1,55 @@
+server:
+  port: 8082
+spring:
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO}  # 기본값 update
+    properties:
+      hibernate:
+        naming:
+          physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+        format_sql: true
+        use_sql_comments: true
+        highlight_sql: true
+    show-sql: true
+  config:
+    import: optional:file:./other-service/.env[.properties]
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  output:
+    ansi:
+      enabled: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    prometheus:
+      access: read_only
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.localcoupon: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+    org.springframework.web: DEBUG
+    com.zaxxer.hikari: INFO
+
+kakao:
+  api:
+    key: ${KAKAO_API_KEY}
+
+monitoring:
+  prometheus:
+    url: http://127.0.0.1:9091
+

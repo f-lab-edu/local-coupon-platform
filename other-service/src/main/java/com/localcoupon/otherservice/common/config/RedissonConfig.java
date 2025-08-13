@@ -1,0 +1,21 @@
+package com.localcoupon.otherservice.common.config;
+
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.StringCodec;
+import org.redisson.config.Config;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class RedissonConfig {
+    @Bean
+    public RedissonClient redissonClient() {
+
+        Config config = new Config();
+        config.useSingleServer().setAddress("redis://localhost:6379")
+                .setConnectTimeout(3000);
+        config.setCodec(new StringCodec()); // Byte에서 JSONJacksonCodec으로 변경
+        return Redisson.create(config);
+    }
+}

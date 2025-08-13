@@ -1,139 +1,69 @@
 plugins {
 	id 'java'
-	id 'jacoco'
-	id 'org.springframework.boot' version '3.5.0'
 	id 'io.spring.dependency-management' version '1.1.7'
-	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+	id 'org.springframework.boot' version '3.2.8' apply false
 }
 
 group = 'com.localcoupon'
 version = '0.0.1-SNAPSHOT'
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+allprojects {
+	repositories {
+		mavenCentral()
 	}
 }
 
-jacoco {
-	toolVersion = "0.8.10" // 최신 버전 확인
-}
+subprojects {
+	apply plugin: 'java'
+	apply plugin: 'io.spring.dependency-management'
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
+	java {
+		toolchain { languageVersion = JavaLanguageVersion.of(17) }
+	}
+
+	ext {
+		springCloudVersion = '2023.0.3'
+	}
+	dependencyManagement {
+		imports {
+			mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+		}
+	}
+
+	dependencies {
+		compileOnly 'org.projectlombok:lombok'
+		annotationProcessor 'org.projectlombok:lombok'
+		testImplementation 'org.junit.jupiter:junit-jupiter'
+	}
+
+	tasks.withType(Test) {
+		useJUnitPlatform()
 	}
 }
 
-repositories {
-	mavenCentral()
-}
+/** =========================
+ *  서비스 모듈 공통(-service)
+ *  - Spring Boot 실행 JAR
+ *  - 공통 테스트 설정
+ *  ========================= */
+configure(subprojects.findAll { it.name.endsWith("-service") }) {
+	apply plugin: 'org.springframework.boot'
+	// 부트 모듈은 실행 JAR만 생성
+	bootJar { enabled = true }
+	jar { enabled = false }
 
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:2025.0.0"
+	dependencies {
+		// 각 서비스 공통으로 자주 쓰는 것들 원하면 여기서 추가 가능
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	}
 }
 
-
-// Querydsl 설정부
-def generated = 'src/main/generated'
-
-// querydsl QClass 파일 생성 위치를 지정
-tasks.withType(JavaCompile) {
-	options.getGeneratedSourceOutputDirectory().set(file(generated))
-}
-
-// java source set 에 querydsl QClass 위치 추가
-sourceSets {
-	main.java.srcDirs += [ generated ]
-}
-
-// gradle clean 시에 QClass 디렉토리 삭제
-clean {
-	delete file(generated)
-}
-def querydslVersion = "5.0.0"
-
-dependencies {
-	implementation libs.spring.boot.starter.web
-	implementation libs.spring.boot.starter.data.jpa
-	implementation libs.spring.boot.starter.data.redis
-	implementation libs.spring.boot.starter.validation
-	implementation libs.spring.boot.starter.aop
-	implementation libs.spring.boot.starter.security
-	implementation libs.spring.boot.starter.batch
-	implementation libs.spring.boot.starter.mail
-	implementation libs.spring.boot.starter.amqp
-	implementation libs.actuator
-
-	compileOnly libs.lombok
-	runtimeOnly libs.mysql.connector
-	annotationProcessor libs.lombok
-	testImplementation libs.spring.boot.starter.test
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-	testImplementation libs.spring.restdocs.mockmvc
-	implementation libs.argon2.jvm
-	testImplementation libs.spring.security.test
-	implementation libs.spring.cloud.openfeign
-	implementation libs.redisson.spring
-	implementation libs.querydsl.core
-	implementation libs.querydsl.collections
-	implementation libs.jakarta.persistence.api
-	annotationProcessor libs.jakarta.persistence.api
-	annotationProcessor libs.jakarta.annotation.api
-	implementation "com.querydsl:querydsl-jpa:${querydslVersion}:jakarta"
-	annotationProcessor "com.querydsl:querydsl-apt:${querydslVersion}:jakarta"
-
-	implementation libs.zxing.core
-	implementation libs.zxing.javase
-
-
-	implementation libs.cloudinary.api
-	implementation libs.prometheus
-}
-
-ext {
-	snippetsDir = file('build/generated-snippets')
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
-	outputs.dir snippetsDir
-	finalizedBy jacocoTestReport // 테스트 끝나면 리포트 생성
-}
-
-jacocoTestReport {
-	dependsOn test
-	reports {
-		xml.required.set(true)
-		csv.required.set(false)
-		html.required.set(true) // HTML 보고서 생성
-		html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
-	}
-}
-
-
-tasks.register('copyDocument', Copy) {
-	dependsOn asciidoctor
-	from asciidoctor.outputDir
-	into 'src/main/resources/static/docs'
-}
-
-
-
-build {
-	dependsOn copyDocument
-}
-
-asciidoctor {
-	inputs.dir snippetsDir
-	dependsOn test
-}
-
-bootJar {
-	dependsOn asciidoctor
-	from("${asciidoctor.outputDir}") {
-		into 'static/docs'
-	}
+/** =========================
+ *  공용/라이브러리 모듈(common 등)
+ *  - 서비스가 아닌 모든 모듈에 적용
+ *  - 라이브러리 JAR만 생성
+ *  ========================= */
+configure(subprojects.findAll { !it.name.endsWith("-service") && !it.name.endsWith("-domain") }) {
+	tasks.matching { it.name == 'bootJar' }.configureEach { enabled = false }
+	jar { enabled = true }
 }
