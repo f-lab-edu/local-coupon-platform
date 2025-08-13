@@ -1,4 +1,4 @@
-package com.localcoupon.common.dto.response;
+package com.localcoupon.couponservice.coupon.common.dto.response;
 
 import io.micrometer.common.util.StringUtils;
 import lombok.Getter;

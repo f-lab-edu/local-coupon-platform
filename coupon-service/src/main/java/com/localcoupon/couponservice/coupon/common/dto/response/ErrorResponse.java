@@ -1,0 +1,32 @@
+package com.localcoupon.couponservice.coupon.common.dto.response;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.localcoupon.couponservice.coupon.common.exception.ErrorCode;
+import lombok.Getter;
+
+@Getter
+public class ErrorResponse extends BaseResponse {
+    private final String errorCode;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private final String detailMessage;
+
+    private ErrorResponse(ErrorCode errorCode, String detailMessage) {
+        super(false, errorCode.getMessage(), errorCode.getStatus());
+        this.errorCode = errorCode.getCode();
+        this.detailMessage = detailMessage;
+    }
+
+    private ErrorResponse(ErrorCode errorCode) {
+        super(false, errorCode.getMessage(), errorCode.getStatus());
+        this.errorCode = errorCode.getCode();
+        this.detailMessage = null;
+    }
+
+    public static ErrorResponse of(ErrorCode errorCode) {
+        return new ErrorResponse(errorCode);
+    }
+    public static ErrorResponse of(ErrorCode errorCode, String detailMessage) {
+        return new ErrorResponse(errorCode, detailMessage);
+    }
+
+}

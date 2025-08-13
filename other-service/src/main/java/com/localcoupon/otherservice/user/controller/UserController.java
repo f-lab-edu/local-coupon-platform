@@ -1,7 +1,7 @@
 package com.localcoupon.otherservice.user.controller;
 
 import com.localcoupon.common.constants.ApiMapping;
-import com.localcoupon.common.dto.response.SuccessResponse;
+import com.localcoupon.otherservice.common.dto.response.SuccessResponse;
 import com.localcoupon.otherservice.user.dto.request.SignUpRequestDto;
 import com.localcoupon.otherservice.user.dto.response.UserResponseDto;
 import com.localcoupon.otherservice.user.service.UserService;

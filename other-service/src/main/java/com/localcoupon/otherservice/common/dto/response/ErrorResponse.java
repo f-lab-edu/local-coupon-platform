@@ -1,7 +1,7 @@
-package com.localcoupon.common.dto.response;
+package com.localcoupon.otherservice.common.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.localcoupon.common.exception.ErrorCode;
+import com.localcoupon.otherservice.common.exception.ErrorCode;
 import lombok.Getter;
 
 @Getter

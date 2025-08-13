@@ -1,7 +1,7 @@
 package com.localcoupon.otherservice.store.service.impl;
 
-import com.localcoupon.common.enums.CommonErrorCode;
-import com.localcoupon.common.exception.CommonException;
+import com.localcoupon.otherservice.common.exception.CommonErrorCode;
+import com.localcoupon.otherservice.common.exception.CommonException;
 import com.localcoupon.otherservice.common.external.kakao.KakaoGeocodeService;
 import com.localcoupon.otherservice.common.external.kakao.dto.KakaoGeocodeInfoDto;
 import com.localcoupon.otherservice.store.dto.request.StoreRequestDto;
@@ -44,7 +44,7 @@ public class StoreServiceImpl implements StoreService {
 
     @Override
     public StoreResponseDto getMyStores(Long userId) {
-        return storeRepository.findFirstByOwnerIdAndIsDeletedFalse(userId)
+        return storeRepository.findFirstByOwnerId(userId)
                 .map(StoreResponseDto::fromEntity)
                 .orElseThrow(() -> new StoreException(StoreErrorCode.STORE_NOT_FOUND_EXCEPTION));
     }

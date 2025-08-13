@@ -1,6 +1,6 @@
 package com.localcoupon.couponservice.coupon.enums;
 
-import com.localcoupon.common.exception.ErrorCode;
+import com.localcoupon.couponservice.coupon.common.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 public enum UserCouponErrorCode implements ErrorCode {
@@ -13,7 +13,8 @@ public enum UserCouponErrorCode implements ErrorCode {
     COUPON_LOCK_FAILED("쿠폰 락 처리에 실패하였습니다.", HttpStatus.CONFLICT),
     COUPON_KEY_PARSING_FAILED("쿠폰 키 파싱 처리에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     COUPON_MAIL_SEND_FAILED("쿠폰 메일 발송에 실패하였습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    COUPON_VALIDATION_PREIOD_FAILED("쿠폰 기간 Validation 실패", HttpStatus.BAD_REQUEST);
+    COUPON_VALIDATION_PREIOD_FAILED("쿠폰 기간 Validation 실패", HttpStatus.BAD_REQUEST),
+    STORE_NOT_FOUND_EXCEPTION("COUPON의 가게 정보가 없습니다", HttpStatus.NOT_FOUND);
 
     private final String message;
     private final HttpStatus status;

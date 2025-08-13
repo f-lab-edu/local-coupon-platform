@@ -1,6 +1,8 @@
 package com.localcoupon.couponservice.coupon.service.impl;
 
 import com.localcoupon.common.enums.Result;
+import com.localcoupon.couponservice.coupon.common.contract.store.StoreResponseDto;
+import com.localcoupon.couponservice.coupon.common.dto.response.SuccessResponse;
 import com.localcoupon.couponservice.coupon.dto.CursorPageRequest;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;
@@ -21,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class CouponManageServiceImpl implements CouponManageService {
@@ -32,7 +36,10 @@ public class CouponManageServiceImpl implements CouponManageService {
     @Override
     @Transactional
     public CouponResponseDto createCoupon(CouponCreateRequestDto request, Long userId) {
-        StoreSummaryDto store = storeServiceClient.getMyStore(userId);
+        StoreResponseDto store = Optional.ofNullable(storeServiceClient.getMyStore(userId))
+                .map(SuccessResponse::getData)
+                .orElseThrow(() -> new UserCouponException(UserCouponErrorCode.STORE_NOT_FOUND_EXCEPTION));
+
         Coupon savedCoupon = couponRepository.save(Coupon.from(request, store.id()));
 
         return CouponResponseDto.from(savedCoupon);
@@ -41,8 +48,12 @@ public class CouponManageServiceImpl implements CouponManageService {
     @Override
     @Transactional(readOnly = true)
     public ListCouponResponseDto getCouponsByOwner(Long ownerId, CursorPageRequest request) {
+        StoreResponseDto store = Optional.ofNullable(storeServiceClient.getMyStore(ownerId))
+                .map(SuccessResponse::getData)
+                .orElseThrow(() -> new UserCouponException(UserCouponErrorCode.STORE_NOT_FOUND_EXCEPTION));
+
         return ListCouponResponseDto.from(couponRepository.findAllByOwnerIdWithCursorPaging(ownerId, request),
-                storeServiceClient.getMyStore(ownerId));
+                StoreSummaryDto.of(store));
     }
 
     @Override

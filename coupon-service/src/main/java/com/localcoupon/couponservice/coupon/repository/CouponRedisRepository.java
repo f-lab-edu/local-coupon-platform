@@ -1,8 +1,8 @@
 package com.localcoupon.couponservice.coupon.repository;
 
-import com.localcoupon.common.enums.CommonErrorCode;
 import com.localcoupon.common.enums.Result;
-import com.localcoupon.common.exception.CommonException;
+import com.localcoupon.couponservice.coupon.common.exception.CommonErrorCode;
+import com.localcoupon.couponservice.coupon.common.exception.CommonException;
 import com.localcoupon.couponservice.coupon.common.util.CouponUtils;
 import com.localcoupon.couponservice.coupon.enums.UserCouponErrorCode;
 import com.localcoupon.couponservice.coupon.exception.UserCouponException;

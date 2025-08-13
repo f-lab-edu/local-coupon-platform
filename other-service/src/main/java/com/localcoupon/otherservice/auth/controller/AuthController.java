@@ -1,11 +1,11 @@
 package com.localcoupon.otherservice.auth.controller;
 
 import com.localcoupon.common.constants.ApiMapping;
-import com.localcoupon.common.dto.response.SuccessResponse;
 import com.localcoupon.otherservice.auth.dto.request.LoginRequestDto;
 import com.localcoupon.otherservice.auth.dto.response.LoginResponseDto;
 import com.localcoupon.otherservice.auth.dto.response.LogoutResponseDto;
 import com.localcoupon.otherservice.auth.service.AuthService;
+import com.localcoupon.otherservice.common.dto.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,9 +1,9 @@
 package com.localcoupon.couponservice.coupon.service.impl;
 
 import com.cloudinary.Cloudinary;
-import com.localcoupon.common.enums.CommonErrorCode;
 import com.localcoupon.common.enums.ImageFormat;
-import com.localcoupon.common.exception.CommonException;
+import com.localcoupon.couponservice.coupon.common.exception.CommonErrorCode;
+import com.localcoupon.couponservice.coupon.common.exception.CommonException;
 import com.localcoupon.couponservice.coupon.dto.CloudinaryUploadOption;
 import com.localcoupon.couponservice.coupon.service.ImageService;
 import lombok.RequiredArgsConstructor;

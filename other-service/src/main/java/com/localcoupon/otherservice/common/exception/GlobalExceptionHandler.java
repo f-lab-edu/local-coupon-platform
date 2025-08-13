@@ -1,8 +1,7 @@
-package com.localcoupon.common.exception;
+package com.localcoupon.otherservice.common.exception;
 
 
-import com.localcoupon.common.dto.response.ErrorResponse;
-import com.localcoupon.common.enums.CommonErrorCode;
+import com.localcoupon.otherservice.common.dto.response.ErrorResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;

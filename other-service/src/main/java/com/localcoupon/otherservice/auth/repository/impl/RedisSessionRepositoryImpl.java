@@ -2,10 +2,10 @@ package com.localcoupon.otherservice.auth.repository.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.localcoupon.common.enums.CommonErrorCode;
-import com.localcoupon.common.exception.CommonException;
 import com.localcoupon.otherservice.auth.dto.UserSessionDto;
 import com.localcoupon.otherservice.auth.repository.SessionRepository;
+import com.localcoupon.otherservice.common.exception.CommonErrorCode;
+import com.localcoupon.otherservice.common.exception.CommonException;
 import com.localcoupon.otherservice.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;

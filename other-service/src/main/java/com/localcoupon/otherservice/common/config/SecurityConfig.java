@@ -1,9 +1,9 @@
 package com.localcoupon.otherservice.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.localcoupon.common.dto.response.ErrorResponse;
 import com.localcoupon.otherservice.auth.enums.AuthErrorCode;
 import com.localcoupon.otherservice.auth.filter.AuthFilter;
+import com.localcoupon.otherservice.common.dto.response.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

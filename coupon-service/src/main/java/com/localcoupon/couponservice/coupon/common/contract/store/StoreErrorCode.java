@@ -1,6 +1,6 @@
-package com.localcoupon.otherservice.store.enums;
+package com.localcoupon.couponservice.coupon.common.contract.store;
 
-import com.localcoupon.otherservice.common.exception.ErrorCode;
+import com.localcoupon.couponservice.coupon.common.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 public enum StoreErrorCode implements ErrorCode {

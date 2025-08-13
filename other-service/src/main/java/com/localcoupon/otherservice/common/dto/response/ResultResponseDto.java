@@ -1,4 +1,4 @@
-package com.localcoupon.common.dto.response;
+package com.localcoupon.otherservice.common.dto.response;
 
 import com.localcoupon.common.enums.Result;
 

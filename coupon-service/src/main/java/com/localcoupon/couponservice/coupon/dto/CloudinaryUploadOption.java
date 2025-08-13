@@ -1,7 +1,7 @@
 package com.localcoupon.couponservice.coupon.dto;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class CloudinaryUploadOption {
 

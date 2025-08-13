@@ -1,15 +1,21 @@
 package com.localcoupon.couponservice.coupon.internal.store.dto;
 
+import com.localcoupon.couponservice.coupon.common.contract.store.StoreCategory;
+import com.localcoupon.couponservice.coupon.common.contract.store.StoreResponseDto;
+
+import java.math.BigDecimal;
+
 public record StoreSummaryDto(
         Long id,
         String name,
         String address,
-        String category,
-        String regionCode,
-        Double latitude,
-        Double longitude
+        StoreCategory category,
+        BigDecimal latitude,
+        BigDecimal longitude
 ) {
-    public static StoreSummaryDto of(Long id, String name, String address, String category, String regionCode, Double latitude, Double longitude) {
-        return new StoreSummaryDto(id, name, address, category, regionCode, latitude, longitude);
+    public static StoreSummaryDto of(StoreResponseDto storeResponseDto) {
+        return new StoreSummaryDto(storeResponseDto.id(), storeResponseDto.name(),
+                storeResponseDto.address(), storeResponseDto.category(), storeResponseDto.latitude(),
+                storeResponseDto.longitude());
     }
 }

@@ -1,8 +1,8 @@
 package com.localcoupon.couponservice.coupon.controller;
 
-import com.localcoupon.common.dto.response.SuccessResponse;
 import com.localcoupon.common.enums.Result;
 import com.localcoupon.couponservice.coupon.annotation.CursorRequest;
+import com.localcoupon.couponservice.coupon.common.dto.response.SuccessResponse;
 import com.localcoupon.couponservice.coupon.dto.CursorPageRequest;
 import com.localcoupon.couponservice.coupon.dto.request.CouponCreateRequestDto;
 import com.localcoupon.couponservice.coupon.dto.request.CouponUpdateRequestDto;

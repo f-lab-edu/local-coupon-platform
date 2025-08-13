@@ -1,6 +1,6 @@
 package com.localcoupon.otherservice.common.external.kakao.enums;
 
-import com.localcoupon.common.exception.ErrorCode;
+import com.localcoupon.otherservice.common.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 public enum KakaoErrorCode implements ErrorCode {

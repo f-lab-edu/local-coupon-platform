@@ -1,5 +1,6 @@
 package com.localcoupon.couponservice.coupon.dto.response;
 
+import com.localcoupon.couponservice.coupon.common.contract.store.StoreResponseDto;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.internal.store.dto.StoreSummaryDto;
 
@@ -9,10 +10,10 @@ public record ListCouponResponseDto(
         List<CouponResponseDto> couponResponseDtos,
         StoreSummaryDto storeResponse
 ) {
-    public static ListCouponResponseDto from(Coupon coupon, StoreSummaryDto storeSummaryDto) {
+    public static ListCouponResponseDto from(Coupon coupon, StoreResponseDto store) {
         return new ListCouponResponseDto(
                 List.of(CouponResponseDto.from(coupon)),
-                storeSummaryDto
+                StoreSummaryDto.of(store)
         );
     }
 
