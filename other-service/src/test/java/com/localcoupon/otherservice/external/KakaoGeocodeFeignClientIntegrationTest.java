@@ -9,17 +9,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@ActiveProfiles("local")
+@ActiveProfiles("test")
 class KakaoGeocodeFeignClientIntegrationTest {
 
-    @Autowired
-    KakaoGeocodeFeignClient kakaoGeocodeFeignClient;
+  @Autowired
+  KakaoGeocodeFeignClient kakaoGeocodeFeignClient;
 
-    @Test
-    void testSearchAddress() {
-        KakaoGeocodeResponse response =
-                kakaoGeocodeFeignClient.searchAddress("서울특별시 송파구 법원로 55");
+  @Test
+  void testSearchAddress() {
+    KakaoGeocodeResponse response =
+        kakaoGeocodeFeignClient.searchAddress("서울특별시 송파구 법원로 55");
 
-        Assertions.assertThat(response.documents().size()).isGreaterThan(0);
-    }
+    Assertions.assertThat(response.documents().size()).isGreaterThan(0);
+  }
 }
