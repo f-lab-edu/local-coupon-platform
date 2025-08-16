@@ -40,7 +40,7 @@ spring:
         highlight_sql: true
     show-sql: false
   config:
-    import: optional:file:./coupon-service/.env[.properties]
+    import: optional:file:./.env[.properties]
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}

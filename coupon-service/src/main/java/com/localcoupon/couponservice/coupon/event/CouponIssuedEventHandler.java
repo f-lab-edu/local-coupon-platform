@@ -25,7 +25,7 @@ public class CouponIssuedEventHandler {
 
   @Async("couponIssueAsync") // 비동기 스레드풀에서 실행
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT) // 커밋 후 실행
-  @Transactional // 리스너 내부 DB 작업을 하나의 트랜잭션으로
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void handle(CouponIssuedEvent e) {
     // 1. 커밋 이후이므로 안전하게 재조회 (영속 엔티티 확보)
     IssuedCoupon issued = issuedCouponRepository.findById(e.issuedCouponId())
