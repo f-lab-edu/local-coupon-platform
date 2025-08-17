@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class CouponIssueServiceImpl implements CouponIssueService {
 
+
   private final CouponRedisRepository couponRedisRepository;
   private final IssuedCouponRepository issuedCouponRepository;
   private final ApplicationEventPublisher eventPublisher;
