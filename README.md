@@ -45,9 +45,3 @@
 ---
 
 
-
-## 프로젝트 Architecture
-
-<img width="1560" height="1080" alt="Cloud Architecture (1)" src="https://github.com/user-attachments/assets/b571955a-8658-461c-b62d-0e7f6acccb9d" />
-
-
