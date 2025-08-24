@@ -1,32 +1,6 @@
 server:
-  port: 8081
-services:
-  other:
-    base-url: http://localhost:8082
-feign:
-  client:
-    config:
-      default:
-        loadbalancer: false
-      storeClient:
-        url: ${services.other.base-url}
-      userClient:
-        url: ${services.other.base-url}
+  port: 8082
 spring:
-  cloud:
-    compatibility-verifier:
-      enabled: false
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_SENDER}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
   jpa:
     open-in-view: false
     hibernate:
@@ -38,9 +12,9 @@ spring:
         format_sql: true
         use_sql_comments: true
         highlight_sql: true
-    show-sql: false
+    show-sql: true
   config:
-    import: optional:file:./.env[.properties]
+    import: optional:file:.env[.properties]
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -67,16 +41,9 @@ logging:
   level:
     root: INFO
     com.localcoupon: DEBUG
-    org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
     org.springframework.web: DEBUG
     com.zaxxer.hikari: INFO
-    org.hibernate.orm.jdbc.extract: trace
-
-cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME}
-  api-key: ${CLOUDINARY_API_KEY}
-  api-secret: ${CLOUDINARY_API_SECRET}
 
 kakao:
   api:
@@ -84,5 +51,5 @@ kakao:
 
 monitoring:
   prometheus:
-    url: http://127.0.0.1:9090
+    url: http://127.0.0.1:9091
 

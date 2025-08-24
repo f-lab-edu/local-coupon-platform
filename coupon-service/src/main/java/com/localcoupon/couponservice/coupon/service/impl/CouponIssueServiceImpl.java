@@ -1,6 +1,7 @@
 package com.localcoupon.couponservice.coupon.service.impl;
 
 import com.localcoupon.common.enums.Result;
+import com.localcoupon.couponservice.coupon.dto.QrUpserResult;
 import com.localcoupon.couponservice.coupon.entity.Coupon;
 import com.localcoupon.couponservice.coupon.entity.IssuedCoupon;
 import com.localcoupon.couponservice.coupon.enums.CouponStock;
@@ -10,6 +11,7 @@ import com.localcoupon.couponservice.coupon.exception.UserCouponException;
 import com.localcoupon.couponservice.coupon.repository.CouponRedisRepository;
 import com.localcoupon.couponservice.coupon.repository.IssuedCouponRepository;
 import com.localcoupon.couponservice.coupon.service.CouponIssueService;
+import com.localcoupon.couponservice.coupon.service.QrTokenService;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class CouponIssueServiceImpl implements CouponIssueService {
 
+
   private final CouponRedisRepository couponRedisRepository;
   private final IssuedCouponRepository issuedCouponRepository;
   private final ApplicationEventPublisher eventPublisher;
+  private final QrTokenService qrTokenService;
 
   @Override
   public Coupon saveCouponForOpen(Coupon coupon) {
@@ -112,6 +116,26 @@ public class CouponIssueServiceImpl implements CouponIssueService {
       handleFailedIssueCoupon(coupon.getId()); // 보상 트랜잭션(재고 복구)
       throw e;
     }
+  }
+
+  @Transactional
+  @Override
+  public QrUpserResult postProcessQrCode(CouponIssuedEvent e) {
+    IssuedCoupon issued = issuedCouponRepository.findById(e.issuedCouponId())
+        .orElseThrow();
+
+    if (!issued.getQrToken().isEmpty()) {
+      return QrUpserResult.of(issued.getId(), issued.getQrImageUrl());
+    }
+
+    String qrToken = qrTokenService.generateQrToken(e.issuedCouponId(), e.validStart(),
+        e.validEnd());
+    String qrImageUrl = qrTokenService.uploadQrImage(qrToken);
+
+    //쿠폰 발급 후처리 진행
+    issued.postProcess(qrToken, qrImageUrl);
+
+    return QrUpserResult.of(issued.getId(), issued.getQrImageUrl());
   }
 
   // 보상 트랜잭션: 쿠폰 발급 실패 시 재고를 복구하는 메서드
